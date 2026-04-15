@@ -490,7 +490,19 @@
 
 <body>
 
-
+    <!-- TOP NAVBAR -->
+    <nav class="topnav">
+        <div class="topnav-brand">
+            <img src="{{ asset('assets/image9.png') }}" width="38" height="38" alt="Logo"
+                style="border-radius: 4px;">
+            <div class="brand-text"><b>SmartSchool</b> Ekskul</div>
+        </div>
+        <div class="topnav-right">
+            <div class="bell-icon"><i class="fas fa-bell"></i></div>
+            <button class="user-btn">{{ Auth::user()->name ?? 'Siswa' }} <i class="fas fa-chevron-down"
+                    style="font-size:13px;"></i></button>
+        </div>
+    </nav>
 
     <div class="app-body">
 

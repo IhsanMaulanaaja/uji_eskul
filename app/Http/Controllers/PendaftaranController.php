@@ -17,10 +17,14 @@ class PendaftaranController extends Controller
         
         // IF ADMIN OR PEMBINA
         if ($user && in_array($user->role, ['admin', 'pembina'])) {
-            if ($user->role === 'pembina') {
+            $isPembina = $user->role === 'pembina';
+            $ekskulNames = null;
+            
+            if ($isPembina) {
                 // Pembina bisa melihat pendaftaran dari semua ekskul yang mereka bina
                 $ekskulIds = Ekstrakurikuler::where('pembina_id', $user->id)->pluck('id');
                 $ekskul = Ekstrakurikuler::where('pembina_id', $user->id)->first(); // untuk display utama
+                $ekskulNames = Ekstrakurikuler::where('pembina_id', $user->id)->pluck('nama')->toArray();
                 
                 $pendaftarTerbaru = Pendaftaran::with('user', 'ekskul')
                     ->whereIn('ekskul_id', $ekskulIds)
@@ -57,7 +61,10 @@ class PendaftaranController extends Controller
                 $jadwals = JadwalEkskul::all();
             }
 
-            return view('pendaftaran-ekskul-admin', compact('ekskul', 'pendaftarTerbaru', 'totalPendaftar', 'totalAnggota', 'pertemuanKe', 'user', 'jadwals'));
+            // Group by ekstrakurikuler for display
+            $groupedByEkskul = $pendaftarTerbaru->groupBy('ekskul_id');
+
+            return view('pendaftaran-ekskul-admin', compact('ekskul', 'pendaftarTerbaru', 'groupedByEkskul', 'totalPendaftar', 'totalAnggota', 'pertemuanKe', 'user', 'jadwals', 'isPembina', 'ekskulNames'));
         }
 
         // IF SISWA

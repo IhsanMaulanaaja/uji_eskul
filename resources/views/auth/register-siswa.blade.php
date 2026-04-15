@@ -1,255 +1,534 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Daftar Siswa - {{ config('app.name', 'Eskul') }}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar Siswa - {{ config('app.name', 'SMK Ciomas') }}</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+  <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        html,body{
-            height:100%;
-            font-family:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial
-        }
-        body{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            background:linear-gradient(180deg,#2b1f6f 0%, #3b2fa6 60%);
-            padding:24px;
-            min-height:100vh
-        }
-        .container{
-            width:100%;
-            max-width:700px;
-            text-align:center;
-            color:#fff
-        }
-        .box{
-            background:rgba(0,0,0,0.06);
-            padding:40px;
-            border-radius:18px
-        }
-        .logo{
-            width:100px;
-            height:100px;
-            margin:0 auto 18px;
-            display:flex;
-            align-items:center;
-            justify-content:center
-        }
-        .logo img{
-            width:90px;
-            height:auto
-        }
-        h1{
-            font-size:24px;
-            color:#ffeccf;
-            margin-bottom:24px;
-            font-weight:700;
-            letter-spacing:1.5px
-        }
-        .form-group{
-            text-align:left;
-            margin-bottom:16px
-        }
-        .row-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .row-grid .form-group {
-            margin-bottom: 0;
-        }
-        label{
-            display:block;
-            color:#ffeccf;
-            font-size:13px;
-            margin-bottom:6px;
-            font-weight:500
-        }
-        input[type=text],
-        input[type=email],
-        input[type=password]{
-            width:100%;
-            padding:11px 12px;
-            border-radius:6px;
-            border:0;
-            background:#fff;
-            color:#222;
-            font-size:14px;
-            font-family:inherit;
-            transition:all 0.3s ease
-        }
-        input[type=text]:focus,
-        input[type=email]:focus,
-        input[type=password]:focus{
-            outline:none;
-            box-shadow:0 0 0 3px rgba(255,236,207,0.3)
-        }
-        input::placeholder{
-            color:#999
-        }
-        .register-btn{
-            display:inline-block;
-            padding:12px 44px;
-            border-radius:24px;
-            background:#fff;
-            color:#222;
-            font-weight:700;
-            box-shadow:0 12px 40px rgba(0,0,0,0.35);
-            border:none;
-            cursor:pointer;
-            margin-top:8px;
-            width:100%;
-            transition:all 0.3s ease
-        }
-        .register-btn:hover{
-            transform:translateY(-2px);
-            box-shadow:0 16px 50px rgba(0,0,0,0.4)
-        }
-        .login-link{
-            margin-top:18px;
-            color:#d6d6ff;
-            font-size:13px
-        }
-        .login-link a{
-            color:#a4c7ff;
-            text-decoration:none;
-            font-weight:600
-        }
-        .login-link a:hover{
-            text-decoration:underline
-        }
-        .error-msg{
-            background:#fee;
-            color:#c00;
-            padding:10px;
-            border-radius:8px;
-            margin-bottom:12px;
-            text-align:left;
-            font-size:12px
-        }
-        .error-msg ul{
-            margin:0;
-            padding-left:20px
-        }
-        .error-msg li{
-            list-style:none;
-            margin-bottom:5px
-        }
-        .password-rules{
-            background:rgba(255,255,255,0.1);
-            border-left:3px solid #a4c7ff;
-            padding:10px 12px;
-            border-radius:6px;
-            margin-top:8px;
-            font-size:12px;
-            color:#e0d8ff;
-            text-align:left
-        }
-        @media(max-width:600px){
-            .box{padding:26px}
-            h1{font-size:20px}
-            .row-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Instrument Sans', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 30px 20px;
+
+      /* ANIMATED GRADIENT */
+      background: linear-gradient(-45deg, #2b1f6f, #3b2fa6, #4f46e5, #2e3fa3, #1e3a8a);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body::before,
+    body::after,
+    body .shape1,
+    body .shape2 {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    body::before {
+      width: 600px;
+      height: 600px;
+      background: rgba(255,255,255,0.08);
+      top: -200px;
+      left: -200px;
+      filter: blur(80px);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    body::after {
+      width: 500px;
+      height: 500px;
+      background: rgba(79, 70, 229, 0.1);
+      bottom: -150px;
+      right: -150px;
+      filter: blur(70px);
+      animation: float 25s ease-in-out infinite reverse;
+    }
+
+    .shape1 {
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.05);
+      top: 20%;
+      right: 10%;
+      filter: blur(50px);
+      animation: float 18s ease-in-out infinite;
+    }
+
+    .shape2 {
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.03);
+      bottom: 20%;
+      left: 10%;
+      filter: blur(40px);
+      animation: float 22s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+
+    .bg-overlay {
+      position: fixed;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      filter: blur(100px);
+      z-index: 0;
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 600px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .register-box {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 25px;
+      padding: 45px 35px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo img {
+      width: 100px;
+      filter: drop-shadow(0 10px 25px rgba(0,0,0,0.4));
+      transition: all 0.3s ease;
+    }
+
+    .logo:hover img {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff, #e0e7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .subtitle i {
+      font-size: 16px;
+      color: #a4c7ff;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 0;
+    }
+
+    .form-row .form-group {
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e0e7ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6366f1;
+      font-size: 16px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 15px 12px 45px;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    }
+
+    .error-text {
+      color: #fecaca;
+      font-size: 11px;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .error-box {
+      background: rgba(220, 38, 38, 0.2);
+      border: 1px solid rgba(220, 38, 38, 0.5);
+      color: #fecaca;
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .error-box strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .error-box ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .error-box li {
+      list-style: none;
+      margin-bottom: 4px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .password-rules {
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-left: 3px solid #a4c7ff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #e0d8ff;
+      text-align: left;
+    }
+
+    .form-hint {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 6px;
+      display: block;
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 50%, #1d4ed8 100%);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
+    .register-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .register-btn:hover::before {
+      left: 100%;
+    }
+
+    .register-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5);
+    }
+
+    .register-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .footer-links {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .footer-links p {
+      color: #d6d6ff;
+      font-size: 13px;
+    }
+
+    .footer-links a {
+      color: #a4c7ff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-home a {
+      color: #a4c7ff;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back-home a:hover {
+      color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .register-box {
+        padding: 35px 25px;
+        border-radius: 20px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-    <div class="box">
+  <!-- SHAPES -->
+  <div class="shape1"></div>
+  <div class="shape2"></div>
 
-        <!-- LOGO -->
-        <div class="logo">
-            <img src="{{ asset('assets/logo.png') }}" alt="SMK CIOMAS">
+  <!-- BACKGROUND LAYER -->
+  <div class="bg-overlay"></div>
+
+  <div class="container">
+    <div class="register-box">
+      <!-- LOGO -->
+      <div class="logo">
+        <img src="{{ asset('assets/logo.png') }}" alt="SMK Ciomas">
+      </div>
+
+      <h1><i class="fas fa-user-graduate"></i> DAFTAR SISWA</h1>
+      <div class="subtitle">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Buat akun untuk mengakses sistem</span>
+      </div>
+
+      @if ($errors->any())
+        <div class="error-box">
+          <strong><i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>Terjadi kesalahan:</strong>
+          <ul>
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
+      <form method="POST" action="{{ route('register-siswa') }}">
+        @csrf
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name"><i class="fas fa-user" style="margin-right: 6px;"></i>Nama Lengkap</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Nama lengkap Anda" autofocus>
+            </div>
+            @error('name')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+          </div>
+
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope" style="margin-right: 6px;"></i>Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="email@school.com">
+            </div>
+            @error('email')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+          </div>
         </div>
 
-        <h1>DAFTAR SISWA</h1>
-
-        @if ($errors->any())
-            <div class="error-msg">
-                <strong>Terjadi kesalahan:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nomor_telepon"><i class="fas fa-phone" style="margin-right: 6px;"></i>Nomor Telepon</label>
+            <div class="input-wrapper">
+              <i class="fas fa-phone"></i>
+              <input type="text" id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}" required placeholder="08xxxxxxxxxx">
             </div>
-        @endif
+            @error('nomor_telepon')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+          </div>
 
-        <form method="POST" action="{{ route('register-siswa') }}">
-            @csrf
-
-            <div class="row-grid">
-                <div class="form-group">
-                    <label for="name">Nama Lengkap</label>
-                    <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Masukkan nama" autofocus>
-                    @error('name')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" required placeholder="Masukkan email">
-                    @error('email')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
+          <div class="form-group">
+            <label for="kelas_jurusan"><i class="fas fa-book" style="margin-right: 6px;"></i>Kelas</label>
+            <div class="input-wrapper">
+              <i class="fas fa-book"></i>
+              <input type="text" id="kelas_jurusan" name="kelas_jurusan" value="{{ old('kelas_jurusan') }}" required placeholder="XI PPLG 1">
             </div>
+            <span class="form-hint">💡 Contoh: XI PPLG 1&Rekayasa Perangkat Lunak</span>
+            @error('kelas_jurusan')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+          </div>
+        </div>
 
-            <div class="row-grid">
-                <div class="form-group">
-                    <label for="nomor_telepon">Nomor Telepon</label>
-                    <input type="text" id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}" required placeholder="Nomor telepon">
-                    @error('nomor_telepon')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
+        <div class="form-group">
+          <label for="alamat"><i class="fas fa-map-marker-alt" style="margin-right: 6px;"></i>Alamat</label>
+          <div class="input-wrapper">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" id="alamat" name="alamat" value="{{ old('alamat') }}" required placeholder="Alamat lengkap Anda">
+          </div>
+          @error('alamat')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+        </div>
 
-                <div class="form-group">
-                    <label for="kelas_jurusan">Kelas</label>
-                    <input type="text" id="kelas_jurusan" name="kelas_jurusan" value="{{ old('kelas_jurusan') }}" required placeholder="Contoh: XI PPLG 1">
-                    <small style="color:#666;font-size:10px;margin-top:2px;display:block">Opsional: Tambahkan &amp; dan jurusan, misalnya: XI PPLG 1&Rekayasa Perangkat Lunak</small>
-                    @error('kelas_jurusan')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock" style="margin-right: 6px;"></i>Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" name="password" required placeholder="Minimal 8 karakter">
             </div>
-
-            <div class="row-grid">
-                <div class="form-group">
-                    <label for="alamat">Alamat</label>
-                    <input type="text" id="alamat" name="alamat" value="{{ old('alamat') }}" required placeholder="Alamat">
-                    @error('alamat')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
+            @error('password')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+            <div class="password-rules">
+              ✓ Minimal 8 karakter<br>
+              ✓ Gunakan kombinasi huruf dan angka
             </div>
+          </div>
 
-            <div class="row-grid">
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Minimal 8 karakter">
-                    @error('password')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                    <div class="password-rules">
-                        • Minimal 8 karakter<br>
-                        • Gunakan kombinasi huruf dan angka
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password_confirmation">Konfirmasi Password</label>
-                    <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Ketik ulang password">
-                    @error('password_confirmation')<span style="color:#c00;font-size:11px;margin-top:4px;display:block">{{ $message }}</span>@enderror
-                </div>
+          <div class="form-group">
+            <label for="password_confirmation"><i class="fas fa-lock" style="margin-right: 6px;"></i>Konfirmasi Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Ulangi password">
             </div>
+            @error('password_confirmation')<span class="error-text"><i class="fas fa-times-circle" style="margin-right: 4px;"></i>{{ $message }}</span>@enderror
+          </div>
+        </div>
 
-            <button class="register-btn" type="submit">DAFTAR</button>
+        <button class="register-btn" type="submit">
+          <i class="fas fa-user-plus" style="margin-right: 8px;"></i>DAFTAR SEKARANG
+        </button>
 
-            <div class="login-link">
-                Sudah punya akun? <a href="{{ route('login-siswa') }}">Masuk di sini</a>
-            </div>
-        </form>
+        <div class="footer-links">
+          <p>Sudah punya akun? <a href="{{ route('login-siswa') }}">Masuk di sini</a></p>
+        </div>
+      </form>
 
+      <div class="back-home">
+        <a href="{{ route('landing') ?? '/' }}">
+          <i class="fas fa-arrow-left"></i> Kembali ke Home
+        </a>
+      </div>
     </div>
-</div>
+  </div>
 </body>
 </html>

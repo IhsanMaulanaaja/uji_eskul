@@ -510,6 +510,86 @@
         .btn-save:hover {
             background: #2563eb;
         }
+
+        /* ===== FILTER BAR EKSTRAKURIKULER ===== */
+        .filter-bar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1a1a1a;
+            white-space: nowrap;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: #5b8deb;
+            color: #5b8deb;
+        }
+
+        .filter-btn.active {
+            background: #5b8deb;
+            color: #fff;
+            border-color: #5b8deb;
+        }
+
+        /* ===== EKSKUL SECTION ===== */
+        .ekskul-section {
+            margin-bottom: 24px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .ekskul-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ekskul-badge {
+            display: inline-block;
+            background: #5b8deb;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -534,30 +614,71 @@
             <div class="sidebar-title">SmartSchool Ekskul</div>
             <div class="sidebar-divider"></div>
             <nav class="sidebar-nav">
-                <a class="nav-item" href="{{ route('dashboard-admin') }}">
-                    <span class="nav-icon"><i class="fas fa-home"></i></span>
-                    Beranda
-                </a>
-                <a class="nav-item" href="{{ route('users.index') }}">
-                    <span class="nav-icon"><i class="fas fa-users"></i></span>
-                    Kelola Pengguna
-                </a>
-                <a class="nav-item" href="{{ route('ekstrakurikuler.index') }}">
-                    <span class="nav-icon"><i class="fas fa-book"></i></span>
-                    Daftar Ekskul
-                </a>
-                <a class="nav-item" href="{{ route('pendaftaran-ekskul') }}">
-                    <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
-                    Pendaftar
-                </a>
-                <a class="nav-item active" href="{{ route('absensi-admin') }}">
-                    <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
-                    Absensi
-                </a>
-                <a class="nav-item" href="{{ route('prestasi-admin') }}">
-                    <span class="nav-icon"><i class="fas fa-medal"></i></span>
-                    Kegiatan &amp; Prestasi
-                </a>
+                @if($user?->role === 'pembina')
+                    <!-- PEMBINA SIDEBAR -->
+                    <a class="nav-item" href="{{ route('dashboard-pembina') }}">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        Beranda
+                    </a>
+                    <a class="nav-item" href="{{ route('pendaftaran-ekskul') }}">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        Pendaftar
+                    </a>
+                    <a class="nav-item" href="{{ route('anggota-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        Kelola Siswa
+                    </a>
+                    <a class="nav-item" href="{{ route('jadwal-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                        Jadwal Latihan
+                    </a>
+                    <a class="nav-item active" href="{{ route('absensi-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
+                        Absensi
+                    </a>
+                    <a class="nav-item" href="{{ route('prestasi-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-medal"></i></span>
+                        Kegiatan &amp; Prestasi
+                    </a>
+                @else
+                    <!-- ADMIN SIDEBAR -->
+                    <a class="nav-item" href="{{ route('dashboard-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        Beranda
+                    </a>
+                    <a class="nav-item" href="{{ route('users.index') }}">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        Kelola Pengguna
+                    </a>
+                    <a class="nav-item" href="{{ route('anggota-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        Kelola Siswa
+                    </a>
+                    <a class="nav-item" href="{{ route('ekstrakurikuler.index') }}">
+                        <span class="nav-icon"><i class="fas fa-book"></i></span>
+                        Daftar Ekskul
+                    </a>
+                    <a class="nav-item" href="{{ route('pendaftaran-ekskul') }}">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        Pendaftar
+                    </a>
+                    <a class="nav-item" href="{{ route('jadwal-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                        Jadwal Latihan
+                    </a>
+                    <a class="nav-item" href="{{ route('jadwal-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                        Jadwal Latihan
+                    </a>
+                    <a class="nav-item active" href="{{ route('absensi-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
+                        Absensi
+                    </a>
+                    <a class="nav-item" href="{{ route('prestasi-admin') }}">
+                        <span class="nav-icon"><i class="fas fa-medal"></i></span>
+                        Kegiatan &amp; Prestasi
+                    </a>
+                @endif
             </nav>
             <div class="logout-area">
                 <form method="POST" action="{{ route('logout') }}" style="width:100%;">
@@ -573,7 +694,7 @@
 
             <div class="card-container">
                 <div class="dash-header">
-                    <h1>Absensi Murid - Per Ekstrakurikuler</h1>
+                    <h1>Absensi {{ $ekskulName ?? 'Murid - Per Ekstrakurikuler' }}</h1>
                     <div class="recap-info">
                         @php \Carbon\Carbon::setLocale('id'); @endphp
                         <span>{{ \Carbon\Carbon::parse($tanggal ?? now())->translatedFormat('l, d F Y') }}</span>
@@ -600,8 +721,25 @@
                     $groupedByEkskul = $absensiList->groupBy('ekskul_id');
                 @endphp
 
+                <!-- Filter Bar Ekstrakurikuler - hanya tampil jika admin atau pembina dengan lebih dari 1 ekskul -->
+                @if (!$isPembina || count($ekskulNames) > 1)
+                <div class="filter-bar">
+                    <span class="filter-label">Pilih Ekstrakurikuler:</span>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter-id="semua" onclick="filterEkskul(this, 'semua')">
+                            Semua
+                        </button>
+                        @foreach($ekskuls as $ekskul)
+                            <button class="filter-btn" data-filter-id="{{ $ekskul->id }}" onclick="filterEkskul(this, '{{ $ekskul->id }}')">
+                                {{ $ekskul->nama }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 @forelse($groupedByEkskul as $ekskulId => $absensiByEkskul)
-                    <div class="ekskul-section">
+                    <div class="ekskul-section" data-ekskul-id="{{ $ekskulId }}">
                         <div class="ekskul-title">
                             <span class="ekskul-badge">{{ $absensiByEkskul->first()->ekskul->nama ?? 'N/A' }}</span>
                             <span style="color: #888; font-size: 14px;">({{ $absensiByEkskul->count() }} siswa)</span>
@@ -724,6 +862,26 @@
 
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
+        }
+
+        function filterEkskul(buttonElement, ekskulId) {
+            // Remove active class dari semua tombol
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Tambah active class ke tombol yang diklik
+            buttonElement.classList.add('active');
+
+            // Hide/show sections
+            document.querySelectorAll('.ekskul-section').forEach(section => {
+                if (ekskulId === 'semua') {
+                    section.style.display = 'block';
+                } else {
+                    const sectionId = section.getAttribute('data-ekskul-id');
+                    section.style.display = (sectionId == ekskulId) ? 'block' : 'none';
+                }
+            });
         }
     </script>
 </body>

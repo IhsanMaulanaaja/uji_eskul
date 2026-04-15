@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSchool Ekskul - Kegiatan & Prestasi Admin</title>
+    <title>SmartSchool Ekskul - Kelola Anggota</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -216,7 +216,6 @@
 
         .btn-action {
             background: #272c72;
-            /* dark blue */
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -233,10 +232,9 @@
 
         .btn-action i {
             color: #8bb4e9;
-            /* Light blue accent for icon */
         }
 
-        /* ===== GALLERY CARD ===== */
+        /* ===== TABLE CARD ===== */
         .card-container {
             background: #fff;
             border-radius: 12px;
@@ -251,70 +249,75 @@
             margin-bottom: 20px;
         }
 
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .photo-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #e2e8f0;
-        }
-
-        .photo-card img {
+        table {
             width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
-            background: #eee;
+            border-collapse: collapse;
         }
 
-        .photo-info {
-            padding: 12px 14px;
+        thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        th {
+            padding: 14px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        tbody tr:hover {
             background: #f8fafc;
         }
 
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
+        .student-name {
+            font-weight: 700;
+            color: #1a1a1a;
         }
 
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .filename {
-            font-size: 16px;
-            font-weight: 800;
-            color: #111;
-        }
-
-        .date {
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 600;
-            color: #475569;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .status-aktif {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-tidak-aktif {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
         }
 
         .btn-tiny {
             border: none;
-            border-radius: 12px;
-            padding: 2px 10px;
-            font-size: 10px;
-            font-weight: 800;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-        }
-
-        .btn-lihat {
-            background: #e2e8f0;
-            color: #475569;
+            transition: all 0.15s;
         }
 
         .btn-edit {
@@ -322,39 +325,17 @@
             color: #166534;
         }
 
+        .btn-edit:hover {
+            background: #86efac;
+        }
+
         .btn-hapus {
             background: #fecaca;
             color: #991b1b;
         }
 
-        .btn-tiny-group {
-            display: flex;
-            gap: 4px;
-        }
-
-        .lihat-semua-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 24px;
-        }
-
-        .btn-lihat-semua {
-            background: #eef2ff;
-            color: #111;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 24px;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-lihat-semua i {
-            color: #3b82f6;
+        .btn-hapus:hover {
+            background: #fca5a5;
         }
 
         /* ===== MODAL & FORM ===== */
@@ -459,6 +440,95 @@
             font-weight: 700;
             cursor: pointer;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #cbd5e1;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .pagination-links {
+            display: flex;
+            gap: 6px;
+        }
+
+        .pagination-links a,
+        .pagination-links span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+            background: #fff;
+            transition: all 0.15s;
+        }
+
+        .pagination-links a:hover {
+            background: #5b8deb;
+            color: #fff;
+            border-color: #5b8deb;
+            cursor: pointer;
+        }
+
+        .pagination-links span.active {
+            background: #5b8deb;
+            color: #fff;
+            border-color: #5b8deb;
+        }
+
+        .pagination-links span.disabled {
+            background: #f8fafc;
+            color: #cbd5e1;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -493,7 +563,7 @@
                         <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
                         Pendaftar
                     </a>
-                    <a class="nav-item" href="{{ route('anggota-admin') }}">
+                    <a class="nav-item active" href="{{ route('anggota-admin') }}">
                         <span class="nav-icon"><i class="fas fa-users"></i></span>
                         Kelola Siswa
                     </a>
@@ -505,7 +575,7 @@
                         <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
                         Absensi
                     </a>
-                    <a class="nav-item active" href="{{ route('prestasi-admin') }}">
+                    <a class="nav-item" href="{{ route('prestasi-admin') }}">
                         <span class="nav-icon"><i class="fas fa-medal"></i></span>
                         Kegiatan &amp; Prestasi
                     </a>
@@ -519,7 +589,7 @@
                         <span class="nav-icon"><i class="fas fa-users"></i></span>
                         Kelola Pengguna
                     </a>
-                    <a class="nav-item" href="{{ route('anggota-admin') }}">
+                    <a class="nav-item active" href="{{ route('anggota-admin') }}">
                         <span class="nav-icon"><i class="fas fa-users"></i></span>
                         Kelola Siswa
                     </a>
@@ -539,7 +609,7 @@
                         <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
                         Absensi
                     </a>
-                    <a class="nav-item active" href="{{ route('prestasi-admin') }}">
+                    <a class="nav-item" href="{{ route('prestasi-admin') }}">
                         <span class="nav-icon"><i class="fas fa-medal"></i></span>
                         Kegiatan &amp; Prestasi
                     </a>
@@ -558,172 +628,127 @@
         <main class="main">
 
             <div class="header-actions">
-                <h1>{{ $ekskulName ? "Prestasi & Kegiatan $ekskulName" : 'Data Tersimpan & Tampil' }}</h1>
-                <div class="btn-group">
-                    <button class="btn-action" onclick="openModal('addModal')">
-                        <i class="fas fa-cloud-upload-alt"></i> Upload Foto
-                    </button>
-                    <button class="btn-action">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                </div>
+                <h1>{{ $ekskulName ? "Anggota $ekskulName" : 'Kelola Siswa' }}</h1>
             </div>
 
-            <div class="card-container">
-                <h2>Foto Dokumentasi</h2>
-
-                <div class="gallery-grid">
-                    @forelse($dokumentasis as $doc)
-                        <div class="photo-card">
-                            <img src="{{ $doc->foto ? Storage::url($doc->foto) : asset('images/no-image.png') }}" alt="Foto">
-                            <div class="photo-info">
-                                <div class="info-row">
-                                    <span
-                                        class="filename">{{ Str::limit($doc->nama_lomba ?? $doc->keterangan, 20) ?? 'Foto ' . $doc->id }}</span>
-                                    <a href="javascript:void(0)" class="btn-tiny btn-lihat"
-                                        style="text-decoration:none; display:inline-block; text-align:center;"
-                                        onclick="openDetailModal(this)"
-                                        data-nama="{{ e($doc->nama_lomba) }}"
-                                        data-tanggal="{{ $doc->tanggal }}"
-                                        data-juara="{{ e($doc->keterangan ?? ($doc->lomba->juara ?? '-')) }}">Lihat</a>
-                                </div>
-                                    <div class="info-row">
-                                    <span
-                                        class="date">{{ \Carbon\Carbon::parse($doc->created_at)->format('d M Y') }}</span>
-                                    <div class="btn-tiny-group">
-                                        <button class="btn-tiny btn-edit"
-                                            onclick="openEditModal({{ $doc->id }}, '{{ addslashes($doc->nama_lomba) }}', '{{ $doc->tanggal }}', '{{ addslashes($doc->keterangan) }}')">Edit</button>
-                                        <button class="btn-tiny btn-hapus"
-                                            onclick="openDeleteModal({{ $doc->id }})">Hapus</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <p style="grid-column: 1 / -1; text-align: center; color: #888; margin-top: 20px;">
-                            @if($user?->role === 'pembina')
-                                Belum ada foto dokumentasi. Klik "Upload Foto" untuk menambahkan dokumentasi kegiatan dan prestasi.
-                            @else
-                                Belum ada foto dokumentasi.
-                            @endif
-                        </p>
-                    @endforelse
+            @if(session('success'))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
                 </div>
+            @endif
 
-                {{-- <div class="lihat-semua-container">
-                    <button class="btn-lihat-semua">
-                        <i class="fas fa-play"></i> Lihat Semua
-                    </button>
-                </div> --}}
+            @if(session('error'))
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                </div>
+            @endif
+
+            <div class="card-container">
+                <h2>Daftar Siswa</h2>
+
+                @if($anggota->count() > 0)
+                    <table style="margin-bottom: 20px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">No</th>
+                                <th style="width: 25%;">Nama Siswa</th>
+                                <th style="width: 15%;">Kelas</th>
+                                <th style="width: 25%;">Email</th>
+                                <th style="width: 12%;">Status</th>
+                                <th style="width: 15%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($anggota as $member)
+                                <tr>
+                                    <td>{{ ($anggota->currentPage() - 1) * $anggota->perPage() + $loop->iteration }}</td>
+                                    <td class="student-name">{{ $member->user->name }}</td>
+                                    <td>{{ $member->user->kelas ?? '-' }}</td>
+                                    <td>{{ $member->user->email }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($member->status)) }}">
+                                            {{ ucfirst($member->status) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-tiny btn-edit"
+                                                onclick="openEditModal({{ $member->id }}, '{{ $member->status }}')">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn-tiny btn-hapus"
+                                                onclick="openDeleteModal({{ $member->id }})">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <!-- PAGINATION -->
+                    <div class="pagination-wrapper">
+                        <div class="pagination-info">
+                            Showing {{ $anggota->firstItem() ?? 0 }} to {{ $anggota->lastItem() ?? 0 }} of {{ $anggota->total() }} results
+                        </div>
+                        <div class="pagination-links">
+                            {{-- Previous Page Link --}}
+                            @if ($anggota->onFirstPage())
+                                <span class="disabled">‹</span>
+                            @else
+                                <a href="{{ $anggota->previousPageUrl() }}">‹</a>
+                            @endif
+                            {{-- Pagination Elements --}}
+                            @foreach ($anggota->getUrlRange(1, $anggota->lastPage()) as $page => $url)
+                                @if ($page == $anggota->currentPage())
+                                    <span class="active">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}">{{ $page }}</a>
+                                @endif
+                            @endforeach
+                            {{-- Next Page Link --}}
+                            @if ($anggota->hasMorePages())
+                                <a href="{{ $anggota->nextPageUrl() }}">›</a>
+                            @else
+                                <span class="disabled">›</span>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Belum ada siswa yang terdaftar di ekstrakurikuler ini.</p>
+                    </div>
+                @endif
 
             </div>
 
         </main>
     </div>
 
-    <!-- ADD MODAL -->
-    <div class="modal-overlay" id="addModal">
-        <form class="modal-content" method="POST" action="{{ route('dokumentasi.store') }}"
-            enctype="multipart/form-data">
-            @csrf
-            <div class="modal-header">
-                <h3>Upload Foto Prestasi</h3>
-                <button type="button" class="close-btn" onclick="closeModal('addModal')"><i
-                        class="fas fa-times"></i></button>
-            </div>
-            <div class="form-group">
-                <label>Ekstrakurikuler</label>
-                <select name="ekstrakurikuler_id" class="form-control" required>
-                    @if($user?->role === 'pembina')
-                        <option value="{{ $ekskuls->first()->id }}" selected>{{ $ekskuls->first()->nama }}</option>
-                    @else
-                        <option value="">-- Pilih Ekstrakurikuler --</option>
-                        @foreach($ekskuls as $ekskul)
-                            <option value="{{ $ekskul->id }}">{{ $ekskul->nama }}</option>
-                        @endforeach
-                    @endif
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Nama Lomba</label>
-                <input type="text" name="nama_lomba" class="form-control" placeholder="Contoh: Juara 1 Futsal"
-                    required>
-            </div>
-            <div class="form-group">
-                <label>Pilih Foto</label>
-                <input type="file" name="foto" class="form-control" accept="image/*" required>
-            </div>
-            <div class="form-group">
-                <label>Tanggal</label>
-                <input type="date" name="tanggal" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Keterangan (Opsional)</label>
-                <input type="text" name="keterangan" class="form-control" placeholder="Contoh: riz-009.jpg">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('addModal')">Batal</button>
-                <button type="submit" class="btn-save">Simpan</button>
-            </div>
-        </form>
-    </div>
-
     <!-- EDIT MODAL -->
     <div class="modal-overlay" id="editModal">
-        <form class="modal-content" id="formEditModal" method="POST" action="" enctype="multipart/form-data">
+        <form class="modal-content" id="formEditModal" method="POST" action="">
             @csrf
             @method('PUT')
             <div class="modal-header">
-                <h3>Edit Data Foto</h3>
+                <h3>Ubah Status Siswa</h3>
                 <button type="button" class="close-btn" onclick="closeModal('editModal')"><i
                         class="fas fa-times"></i></button>
             </div>
             <div class="form-group">
-                <label>Nama Lomba</label>
-                <input type="text" name="nama_lomba" id="edit_nama_lomba" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Keterangan (Opsional)</label>
-                <input type="text" name="keterangan" id="edit_keterangan" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Tanggal</label>
-                <input type="date" name="tanggal" id="edit_tanggal" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Ganti Foto (Opsional)</label>
-                <input type="file" name="foto" class="form-control" accept="image/*">
+                <label>Status</label>
+                <select name="status" id="edit_status" class="form-control" required>
+                    <option value="aktif">Aktif</option>
+                    <option value="tidak aktif">Tidak Aktif</option>
+                </select>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Batal</button>
-                <button type="submit" class="btn-save">Update</button>
+                <button type="submit" class="btn-save">Simpan</button>
             </div>
         </form>
-    </div>
-
-    <!-- DETAIL MODAL -->
-    <div class="modal-overlay" id="detailModal">
-        <div class="modal-content" style="max-width: 420px;">
-            <div class="modal-header">
-                <h3>Detail Foto Dokumentasi</h3>
-                <button type="button" class="close-btn" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="form-group">
-                <label>Nama Lomba</label>
-                <p id="detail_nama" style="margin: 6px 0 12px; color:#333; font-weight:700;"></p>
-            </div>
-            <div class="form-group">
-                <label>Tanggal Juara</label>
-                <p id="detail_tanggal" style="margin: 6px 0 12px; color:#333;"></p>
-            </div>
-            <div class="form-group">
-                <label>Juara</label>
-                <p id="detail_juara" style="margin: 6px 0 12px; color:#333;"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('detailModal')">Tutup</button>
-            </div>
-        </div>
     </div>
 
     <!-- DELETE MODAL -->
@@ -732,12 +757,12 @@
             @csrf
             @method('DELETE')
             <div class="modal-header">
-                <h3>Hapus Foto</h3>
+                <h3>Hapus Siswa</h3>
                 <button type="button" class="close-btn" onclick="closeModal('deleteModal')"><i
                         class="fas fa-times"></i></button>
             </div>
             <p style="font-size:15px; color:#444; margin-bottom: 20px;">
-                Apakah Anda yakin ingin menghapus foto ini? Data yang dihapus tidak dapat dikembalikan.
+                Apakah Anda yakin ingin menghapus siswa ini dari ekstrakurikuler? Data yang dihapus tidak dapat dikembalikan.
             </p>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Batal</button>
@@ -755,31 +780,17 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        function openEditModal(id, namaLomba, tanggal, keterangan) {
+        function openEditModal(id, status) {
             const form = document.getElementById('formEditModal');
-            form.action = `/prestasi-ekskul/dokumentasi/${id}`;
-            document.getElementById('edit_nama_lomba').value = namaLomba;
-            document.getElementById('edit_tanggal').value = tanggal;
-            document.getElementById('edit_keterangan').value = keterangan;
+            form.action = `/anggota-ekskul/${id}/status`;
+            document.getElementById('edit_status').value = status;
             openModal('editModal');
         }
 
         function openDeleteModal(id) {
             const form = document.getElementById('formDeleteModal');
-            form.action = `/prestasi-ekskul/dokumentasi/${id}`;
+            form.action = `/anggota-ekskul/${id}`;
             openModal('deleteModal');
-        }
-
-        function openDetailModal(el) {
-            const nama = el.getAttribute('data-nama') || '-';
-            const tanggal = el.getAttribute('data-tanggal') || '-';
-            const juara = el.getAttribute('data-juara') || '-';
-
-            document.getElementById('detail_nama').textContent = nama;
-            document.getElementById('detail_tanggal').textContent = tanggal;
-            document.getElementById('detail_juara').textContent = juara;
-
-            openModal('detailModal');
         }
     </script>
 </body>

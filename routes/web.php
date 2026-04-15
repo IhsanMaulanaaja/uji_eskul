@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landing');
-});
+})->name('landing');
 
 Route::get('/login-admin', function () {
     return view('auth.login-admin');
@@ -44,6 +44,21 @@ Route::get('/absensi-ekskul', [AbsensiController::class, 'index'])->middleware([
 Route::put('/absensi-ekskul/{id}', [AbsensiController::class, 'update'])->middleware(['auth', 'verified'])->name('absensi.update');
 Route::get('/absensi-siswa', [AbsensiController::class, 'siswa'])->middleware(['auth', 'verified'])->name('absensi-siswa');
 Route::post('/absensi-siswa', [AbsensiController::class, 'storeSiswa'])->middleware(['auth', 'verified'])->name('absensi-siswa.store');
+
+// ANGGOTA EKSKUL
+use App\Http\Controllers\AnggotaController;
+Route::get('/anggota-ekskul', [AnggotaController::class, 'indexAdmin'])->middleware(['auth', 'verified'])->name('anggota-admin');
+Route::put('/anggota-ekskul/{id}/status', [AnggotaController::class, 'updateStatus'])->middleware(['auth', 'verified'])->name('anggota.status');
+Route::delete('/anggota-ekskul/{id}', [AnggotaController::class, 'destroy'])->middleware(['auth', 'verified'])->name('anggota.destroy');
+
+// JADWAL EKSKUL
+use App\Http\Controllers\JadwalController;
+Route::get('/jadwal-ekskul', [JadwalController::class, 'index'])->middleware(['auth', 'verified'])->name('jadwal-admin');
+Route::get('/jadwal-ekskul/create', [JadwalController::class, 'create'])->middleware(['auth', 'verified'])->name('jadwal.create');
+Route::post('/jadwal-ekskul', [JadwalController::class, 'store'])->middleware(['auth', 'verified'])->name('jadwal.store');
+Route::get('/jadwal-ekskul/{id}/edit', [JadwalController::class, 'edit'])->middleware(['auth', 'verified'])->name('jadwal.edit');
+Route::put('/jadwal-ekskul/{id}', [JadwalController::class, 'update'])->middleware(['auth', 'verified'])->name('jadwal.update');
+Route::delete('/jadwal-ekskul/{id}', [JadwalController::class, 'destroy'])->middleware(['auth', 'verified'])->name('jadwal.destroy');
 
 use App\Http\Controllers\PrestasiController;
 

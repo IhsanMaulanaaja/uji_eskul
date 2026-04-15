@@ -14,4 +14,10 @@ class JadwalEkskul extends Model
         'jam_selesai',
         'lokasi',
     ];
+
+    public function ekskul()
+    {
+        return $this->belongsTo(Ekstrakurikuler::class, 'ekskul_id');
+    }
 }
+

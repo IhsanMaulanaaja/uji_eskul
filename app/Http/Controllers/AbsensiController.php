@@ -17,11 +17,20 @@ class AbsensiController extends Controller
         
         if ($user?->role === 'admin' || $user?->role === 'pembina') {
             $query = Absensi::with(['user', 'ekskul']);
+            $ekskulName = null;
+            $ekskulNames = null;
+            $isPembina = $user->role === 'pembina';
             
-            if ($user->role === 'pembina') {
+            if ($isPembina) {
                 // Pembina hanya bisa melihat absensi ekskul yang mereka bina
                 $ekskulIds = Ekstrakurikuler::where('pembina_id', $user->id)->pluck('id');
                 $query->whereIn('ekskul_id', $ekskulIds);
+                $ekskuls = Ekstrakurikuler::where('pembina_id', $user->id)->get();
+                $ekskulName = $ekskuls->first()?->nama; // Get pembina's ekstrakurikuler name
+                $ekskulNames = $ekskuls->pluck('nama')->toArray();
+            } else {
+                // Admin bisa lihat semua
+                $ekskuls = Ekstrakurikuler::all();
             }
 
             // Tanggal Filter
@@ -50,7 +59,7 @@ class AbsensiController extends Controller
             // Pagination: 10 items per page
             $absensiList = $query->paginate(10);
             
-            return view('absensi-admin', compact('absensiList', 'tanggal', 'status', 'nama'));
+            return view('absensi-admin', compact('absensiList', 'tanggal', 'status', 'nama', 'user', 'ekskuls', 'ekskulName', 'isPembina', 'ekskulNames'));
         }
         
         return view('absensi-ekskul-siswa');

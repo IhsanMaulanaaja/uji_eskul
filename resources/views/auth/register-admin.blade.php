@@ -288,10 +288,6 @@
                 </div>
 
                 <button class="register-btn" type="submit">DAFTAR</button>
-
-                <div class="login-link">
-                    Sudah punya akun? <a href="{{ route('login-admin') }}">Masuk di sini</a>
-                </div>
             </form>
 
         </div>

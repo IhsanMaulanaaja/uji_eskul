@@ -367,6 +367,10 @@
                     <span class="nav-icon"><i class="fas fa-users"></i></span>
                     Kelola Pengguna
                 </a>
+                <a class="nav-item" href="{{ route('anggota-admin') }}">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    Kelola Siswa
+                </a>
                 <a class="nav-item active" href="{{ route('ekstrakurikuler.index') }}">
                     <span class="nav-icon"><i class="fas fa-book"></i></span>
                     Daftar Ekskul
@@ -374,6 +378,10 @@
                 <a class="nav-item" href="{{ route('pendaftaran-ekskul') }}">
                     <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
                     Pendaftar
+                </a>
+                <a class="nav-item" href="{{ route('jadwal-admin') }}">
+                    <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                    Jadwal Latihan
                 </a>
                 <a class="nav-item" href="{{ route('absensi-admin') }}">
                     <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>

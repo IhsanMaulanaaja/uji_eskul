@@ -20,6 +20,67 @@
             background: #dce3ea;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOP NAVBAR ===== */
+        .topnav {
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            height: 62px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .topnav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-text {
+            font-size: 19px;
+            font-weight: 800;
+            color: #1c1c1c;
+        }
+
+        .topnav-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .bell-icon {
+            font-size: 22px;
+            color: #222;
+            cursor: pointer;
+        }
+
+        .user-btn {
+            background: #5b8deb;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 22px;
+            font-size: 17px;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app-container {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - 62px);
         }
 
         /* ===== SIDEBAR ===== */
@@ -31,11 +92,11 @@
             align-items: center;
             padding: 40px 0 30px;
             flex-shrink: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
+            height: calc(100vh - 62px);
+            overflow: hidden;
             border-right: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 62px;
         }
 
         .sidebar-logo {
@@ -142,12 +203,12 @@
 
         /* ===== MAIN CONTENT ===== */
         .main {
-            margin-left: 260px;
             flex: 1;
             padding: 24px 32px;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            overflow-y: auto;
         }
 
         /* Top Header Card */
@@ -424,6 +485,9 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
+            position: sticky;
+            top: 24px;
+            height: fit-content;
         }
 
         .jadwal-card {
@@ -488,10 +552,79 @@
             object-fit: cover;
             border-radius: 8px;
         }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1a1a1a;
+            white-space: nowrap;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            scrollbar-width: none;
+        }
+
+        .filter-buttons::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: #5b8deb;
+            color: #5b8deb;
+        }
+
+        .filter-btn.active {
+            background: #5b8deb;
+            color: #fff;
+            border-color: #5b8deb;
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- TOP NAVBAR -->
+    <nav class="topnav">
+        <div class="topnav-brand">
+            <img src="{{ asset('assets/image9.png') }}" width="38" height="38" alt="Logo" style="border-radius: 4px;">
+            <div class="brand-text"><b>SmartSchool</b> Ekskul</div>
+        </div>
+        <div class="topnav-right">
+            <div class="bell-icon"><i class="fas fa-bell"></i></div>
+            <button class="user-btn">{{ Auth::user()->name ?? 'User' }} <i class="fas fa-chevron-down" style="font-size:13px;"></i></button>
+        </div>
+    </nav>
+
+    <div class="app-container">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -503,21 +636,46 @@
         <div class="sidebar-divider"></div>
 
         <nav class="sidebar-nav">
-            <a class="nav-item" href="{{ route('dashboard-admin') }}">
+            <!-- BERANDA -->
+            <a class="nav-item" href="{{ $user?->role === 'pembina' ? route('dashboard-pembina') : route('dashboard-admin') }}">
                 <span class="nav-icon"><i class="fas fa-home"></i></span>
                 Beranda
             </a>
-            <a class="nav-item" href="{{ route('users.index') }}">
-                <span class="nav-icon"><i class="fas fa-users"></i></span>
-                Kelola Pengguna
-            </a>
-            <a class="nav-item" href="{{ route('ekstrakurikuler.index') }}">
-                <span class="nav-icon"><i class="fas fa-book"></i></span>
-                Daftar Ekskul
-            </a>
-            <a class="nav-item active" href="{{ route('pendaftaran-ekskul') }}">
-                <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
-                Pendaftar
+
+            <!-- UNTUK PEMBINA: PENDAFTAR DI ATAS -->
+            @if($user?->role === 'pembina')
+                <a class="nav-item active" href="{{ route('pendaftaran-ekskul') }}">
+                    <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                    Pendaftar
+                </a>
+                <a class="nav-item" href="{{ route('anggota-admin') }}">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    Kelola Siswa
+                </a>
+            @else
+                <!-- UNTUK ADMIN: MENU ADMIN DULU -->
+                <a class="nav-item" href="{{ route('users.index') }}">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    Kelola Pengguna
+                </a>
+                <a class="nav-item" href="{{ route('anggota-admin') }}">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    Kelola Siswa
+                </a>
+                <a class="nav-item" href="{{ route('ekstrakurikuler.index') }}">
+                    <span class="nav-icon"><i class="fas fa-book"></i></span>
+                    Daftar Ekskul
+                </a>
+                <a class="nav-item active" href="{{ route('pendaftaran-ekskul') }}">
+                    <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                    Pendaftar
+                </a>
+            @endif
+
+            <!-- MENU SHARED BOTH -->
+            <a class="nav-item" href="{{ route('jadwal-admin') }}">
+                <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                Jadwal Latihan
             </a>
             <a class="nav-item" href="{{ route('absensi-admin') }}">
                 <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
@@ -525,7 +683,7 @@
             </a>
             <a class="nav-item" href="{{ route('prestasi-admin') }}">
                 <span class="nav-icon"><i class="fas fa-medal"></i></span>
-                Kegiatan &amp; Prestasi
+                Kegiatan & Prestasi
             </a>
         </nav>
 
@@ -586,15 +744,41 @@
 
             <!-- Pendaftar Table -->
             <div class="pendaftar-card">
-                <h3>Pendaftar Terbaru - Per Ekstrakurikuler</h3>
+                @if ($isPembina && count($ekskulNames) === 1)
+                    <h3>Pendaftar {{ $ekskulNames[0] }} Terbaru</h3>
+                @else
+                    <h3>Pendaftar Terbaru - Per Ekstrakurikuler</h3>
+                @endif
 
                 @php
                     // Group pendaftar by ekstrakurikuler
                     $groupedByEkskul = $pendaftarTerbaru->groupBy('ekskul_id');
                 @endphp
 
+                <!-- Filter Bar - hanya tampil jika admin atau pembina dengan lebih dari 1 ekskul -->
+                @if (!$isPembina || count($ekskulNames) > 1)
+                <div class="filter-bar">
+                    <span class="filter-label">Pilih Ekstrakurikuler:</span>
+                    <div class="filter-buttons" id="filterButtonsContainer">
+                        <button class="filter-btn active" data-filter-id="semua" onclick="filterEkskul(this, 'semua')">
+                            Semua
+                        </button>
+                        @php
+                            $allEkskul = $groupedByEkskul->map(function($items) {
+                                return $items->first()->ekskul;
+                            })->unique('id');
+                        @endphp
+                        @foreach($allEkskul as $ekskul)
+                            <button class="filter-btn" data-filter-id="{{ $ekskul->id }}" onclick="filterEkskul(this, '{{ $ekskul->id }}')">
+                                {{ $ekskul->nama }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 @forelse($groupedByEkskul as $ekskulId => $pendaftarByEkskul)
-                    <div class="ekskul-section">
+                    <div class="ekskul-section" data-ekskul-id="{{ $ekskulId }}">
                         <div class="ekskul-title">
                             <span class="ekskul-badge">{{ $pendaftarByEkskul->first()->ekskul->nama ?? 'N/A' }}</span>
                             <span style="color: #888; font-size: 14px;">({{ $pendaftarByEkskul->count() }} pendaftar)</span>
@@ -603,6 +787,7 @@
                         <table style="margin-bottom: 0;">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px;">No.</th>
                                     <th>Nama</th>
                                     <th>Kelas</th>
                                     <th>Alasan</th>
@@ -611,8 +796,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($pendaftarByEkskul as $pd)
+                                @foreach($pendaftarByEkskul as $index => $pd)
                                     <tr>
+                                        <td style="font-weight: 700; color: #666;">{{ $index + 1 }}</td>
                                         <td>
                                             <div class="user-cell">
                                                 <div class="user-avatar">
@@ -697,34 +883,79 @@
             <!-- Right Column -->
             <div class="right-col">
                 <div class="jadwal-card">
-                    <h3>Jadwal Ekskul</h3>
+    <h3>Jadwal Ekskul</h3>
 
-                    @if (isset($jadwals) && $jadwals->count() > 0)
-                        @foreach ($jadwals as $jadwal)
-                            <div class="jadwal-info" style="margin-bottom: 12px; font-size: 15px;">
-                                <i class="fas fa-calendar-alt" style="color: #3b82f6;"></i>
-                                {{ ucfirst($jadwal->hari) }},
-                                {{ \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i') }} -
-                                {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }}
-                                @if ($jadwal->lokasi)
-                                    <span style="display:block; font-size: 13px; color:#555; margin-left: 20px;"><i
-                                            class="fas fa-map-marker-alt"
-                                            style="color:#ef4444; margin-right: 4px;"></i>
-                                        {{ $jadwal->lokasi }}</span>
-                                @endif
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="jadwal-info" style="color: #888; font-weight: normal;">
-                            Belum ada jadwal yang diatur.
-                        </div>
-                    @endif
+    @if (isset($jadwals) && $jadwals->count() > 0)
 
+        @foreach ($jadwals->groupBy('ekskul_id') as $ekskulId => $items)
+            
+            <!-- CARD PER EKSKUL -->
+            <div style="margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                
+                <!-- NAMA EKSKUL -->
+                <div style="font-weight: 800; color: #5b8deb; margin-bottom: 8px;">
+                    {{ $items->first()->ekskul->nama ?? 'Ekskul' }}
                 </div>
+
+                <!-- LIST JADWAL -->
+                @foreach ($items as $jadwal)
+                    <div style="margin-bottom: 10px; font-size: 14px; color:#333;">
+                        
+                        <i class="fas fa-calendar-alt" style="color:#3b82f6;"></i>
+                        {{ ucfirst($jadwal->hari) }}, 
+                        {{ \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i') }} -
+                        {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }}
+
+                        <!-- LOKASI -->
+                        @if ($jadwal->lokasi)
+                            <div style="margin-left: 20px; font-size: 13px; color:#666;">
+                                <i class="fas fa-map-marker-alt" style="color:#ef4444;"></i>
+                                {{ $jadwal->lokasi }}
+                            </div>
+                        @endif
+
+                    </div>
+                @endforeach
+
+            </div>
+
+        @endforeach
+
+    @else
+        <div style="color: #888;">
+            Belum ada jadwal
+        </div>
+    @endif
+</div>
+
             </div>
 
         </div>
     </main>
+
+    <script>
+        function filterEkskul(buttonElement, ekskulId) {
+            // Remove active class dari semua tombol
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Tambah active class ke tombol yang diklik
+            buttonElement.classList.add('active');
+
+            // Hide/show sections
+            document.querySelectorAll('.ekskul-section').forEach(section => {
+                if (ekskulId === 'semua') {
+                    section.style.display = 'block';
+                } else {
+                    const sectionId = section.getAttribute('data-ekskul-id');
+                    section.style.display = (sectionId == ekskulId) ? 'block' : 'none';
+                }
+            });
+        }
+    </script>
+
+    </div><!-- Close app-container -->
 
 </body>
 

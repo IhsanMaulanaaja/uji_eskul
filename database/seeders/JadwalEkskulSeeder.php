@@ -15,7 +15,7 @@ class JadwalEkskulSeeder extends Seeder
     {
         $jadwalData = [
             'Pramuka' => ['hari' => 'jumat', 'jam_mulai' => '15:00:00', 'jam_selesai' => '17:00:00', 'lokasi' => 'Lapangan Utama'],
-            'Futsal' => ['hari' => 'selasa', 'jam_mulai' => '16:00:00', 'jam_selesai' => '18:00:00', 'lokasi' => 'Lapangan Futsal'],
+            'Futsal' => ['hari' => 'sabtu', 'jam_mulai' => '15:00:00', 'jam_selesai' => '17:00:00', 'lokasi' => 'Lapangan VND'],
             'Basket' => ['hari' => 'rabu', 'jam_mulai' => '15:30:00', 'jam_selesai' => '17:30:00', 'lokasi' => 'Lapangan Basket'],
             'PMR' => ['hari' => 'kamis', 'jam_mulai' => '15:00:00', 'jam_selesai' => '16:30:00', 'lokasi' => 'UKS'],
             'Voli' => ['hari' => 'sabtu', 'jam_mulai' => '08:00:00', 'jam_selesai' => '10:00:00', 'lokasi' => 'Lapangan Voli'],

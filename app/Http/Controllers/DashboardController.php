@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Ekstrakurikuler;
+use App\Models\Pendaftaran;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -160,9 +161,100 @@ class DashboardController extends Controller
 
     public function pembina()
     {
-        if (auth()->user()?->role !== 'pembina') {
+        $user = auth()->user();
+        
+        if ($user?->role !== 'pembina') {
             abort(403);
         }
-        return view('Admin.berandapembina');
+
+        // Get ekstrakurikuler yang dibina oleh pembina ini
+        $ekskul = Ekstrakurikuler::where('pembina_id', $user->id)->first();
+        
+        if (!$ekskul) {
+            // Jika pembina tidak memiliki ekskul, redirect ke halaman info
+            return view('Admin.berandapembina', ['ekskul' => null]);
+        }
+
+        // 1. Total Pendaftar untuk ekskul ini
+        $totalPendaftar = DB::table('pendaftaran')
+            ->where('ekskul_id', $ekskul->id)
+            ->count();
+
+        $totalDitolak = DB::table('pendaftaran')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('status', 'ditolak')
+            ->count();
+
+        $totalDiterima = DB::table('pendaftaran')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('status', 'disetujui')
+            ->count();
+
+        $totalMenunggu = DB::table('pendaftaran')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('status', 'menunggu')
+            ->count();
+
+        // 2. Total Anggota Aktif
+        $totalAnggota = DB::table('anggota_ekskul')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('status', 'aktif')
+            ->count();
+
+        // 3. Pendaftaran Terbaru (hanya untuk ekskul ini)
+        $pendaftaranTerbaru = Pendaftaran::with('user', 'ekskul')
+            ->where('ekskul_id', $ekskul->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // 4. Absensi hari ini
+        $tanggalHariIni = Carbon::today()->toDateString();
+        $absensiHariIni = DB::table('absensi')
+            ->where('ekskul_id', $ekskul->id)
+            ->whereDate('tanggal', $tanggalHariIni)
+            ->count();
+
+        $hadirHariIni = DB::table('absensi')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('status', 'hadir')
+            ->whereDate('tanggal', $tanggalHariIni)
+            ->count();
+
+        // 5. Prestasi/Dokumentasi terbaru
+        $prestasiTerbaru = DB::table('dokumentasi')
+            ->where('ekstrakurikuler_id', $ekskul->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        // 6. Jadwal Latihan untuk ekskul ini
+        $jadwalLatihan = DB::table('jadwal_ekskul')
+            ->where('ekskul_id', $ekskul->id)
+            ->orderByRaw("CASE 
+                WHEN hari = 'senin' THEN 1
+                WHEN hari = 'selasa' THEN 2
+                WHEN hari = 'rabu' THEN 3
+                WHEN hari = 'kamis' THEN 4
+                WHEN hari = 'jumat' THEN 5
+                WHEN hari = 'sabtu' THEN 6
+                WHEN hari = 'minggu' THEN 7
+                ELSE 8
+            END")
+            ->get();
+
+        return view('Admin.berandapembina', compact(
+            'ekskul',
+            'totalPendaftar',
+            'totalDitolak',
+            'totalDiterima',
+            'totalMenunggu',
+            'totalAnggota',
+            'pendaftaranTerbaru',
+            'absensiHariIni',
+            'hadirHariIni',
+            'prestasiTerbaru',
+            'jadwalLatihan'
+        ));
     }
 }

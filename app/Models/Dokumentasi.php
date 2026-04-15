@@ -15,6 +15,11 @@ class Dokumentasi extends Model
         return $this->belongsTo(Lomba::class, 'lomba_id');
     }
 
+    public function ekstrakurikuler()
+    {
+        return $this->belongsTo(Ekstrakurikuler::class, 'ekstrakurikuler_id');
+    }
+
     public function getFotoUrlAttribute()
     {
         if (!$this->foto) {

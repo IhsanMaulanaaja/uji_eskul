@@ -18,4 +18,9 @@ class Ekstrakurikuler extends Model
     {
         return $this->hasMany(JadwalEkskul::class, 'ekskul_id');
     }
+
+    public function anggota()
+    {
+        return $this->hasMany(AnggotaEkskul::class, 'ekskul_id');
+    }
 }

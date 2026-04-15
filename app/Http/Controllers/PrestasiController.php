@@ -14,8 +14,25 @@ class PrestasiController extends Controller
 
     public function indexAdmin()
     {
-        $dokumentasis = Dokumentasi::latest()->get();
-        return view('prestasi-admin', compact('dokumentasis'));
+        $user = auth()->user();
+        $ekskulName = null;
+        $ekskulNames = null;
+        $isPembina = $user->role === 'pembina';
+        
+        if ($isPembina) {
+            // Pembina hanya bisa melihat dokumentasi dari ekskul yang mereka bina
+            $ekskulIds = Ekstrakurikuler::where('pembina_id', $user->id)->pluck('id');
+            $dokumentasis = Dokumentasi::whereIn('ekstrakurikuler_id', $ekskulIds)->latest()->get();
+            $ekskuls = Ekstrakurikuler::where('pembina_id', $user->id)->get();
+            $ekskulName = $ekskuls->first()?->nama; // Get pembina's ekstrakurikuler name
+            $ekskulNames = $ekskuls->pluck('nama')->toArray();
+        } else {
+            // Admin bisa melihat semua
+            $dokumentasis = Dokumentasi::latest()->get();
+            $ekskuls = Ekstrakurikuler::all();
+        }
+        
+        return view('prestasi-admin', compact('dokumentasis', 'ekskuls', 'user', 'ekskulName', 'isPembina', 'ekskulNames'));
     }
 
     public function indexSiswa()
@@ -26,17 +43,31 @@ class PrestasiController extends Controller
 
     public function storeDokumentasi(Request $request)
     {
+        $user = auth()->user();
+        
         $request->validate([
             'foto' => 'required|image|max:2048',
+            'ekstrakurikuler_id' => 'required|exists:ekstrakurikuler,id',
             'nama_lomba' => 'required|string|max:255',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string|max:255',
         ]);
 
+        // Jika user adalah pembina, pastikan ekskul_id adalah ekskul yang mereka bina
+        if ($user->role === 'pembina') {
+            $ekskul = Ekstrakurikuler::where('id', $request->ekstrakurikuler_id)
+                                    ->where('pembina_id', $user->id)
+                                    ->first();
+            if (!$ekskul) {
+                return back()->with('error', 'Anda tidak memiliki akses ke ekskul ini');
+            }
+        }
+
         $path = $request->file('foto')->store('dokumentasi', 'public');
 
         Dokumentasi::create([
             'foto' => $path,
+            'ekstrakurikuler_id' => $request->ekstrakurikuler_id,
             'nama_lomba' => $request->nama_lomba,
             'tanggal' => $request->tanggal,
             'keterangan' => $request->keterangan
@@ -48,6 +79,17 @@ class PrestasiController extends Controller
     public function updateDokumentasi(Request $request, $id)
     {
         $doc = Dokumentasi::findOrFail($id);
+        $user = auth()->user();
+
+        // Jika pembina, pastikan dokumentasi adalah dari ekskul yang mereka bina
+        if ($user->role === 'pembina') {
+            $ekskul = Ekstrakurikuler::where('id', $doc->ekstrakurikuler_id)
+                                    ->where('pembina_id', $user->id)
+                                    ->first();
+            if (!$ekskul) {
+                return back()->with('error', 'Anda tidak memiliki akses ke dokumentasi ini');
+            }
+        }
 
         $request->validate([
             'foto' => 'nullable|image|max:2048',
@@ -72,6 +114,18 @@ class PrestasiController extends Controller
     public function destroyDokumentasi($id)
     {
         $doc = Dokumentasi::findOrFail($id);
+        $user = auth()->user();
+
+        // Jika pembina, pastikan dokumentasi adalah dari ekskul yang mereka bina
+        if ($user->role === 'pembina') {
+            $ekskul = Ekstrakurikuler::where('id', $doc->ekstrakurikuler_id)
+                                    ->where('pembina_id', $user->id)
+                                    ->first();
+            if (!$ekskul) {
+                return back()->with('error', 'Anda tidak memiliki akses ke dokumentasi ini');
+            }
+        }
+
         if ($doc->foto) Storage::disk('public')->delete($doc->foto);
         $doc->delete();
 
