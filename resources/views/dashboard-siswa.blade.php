@@ -4,6 +4,7 @@
 <head>
     @php
         use Carbon\Carbon;
+        use Illuminate\Support\Str;
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -438,6 +439,116 @@
             color: #1a1a1a;
         }
 
+        /* ===== PENDAFTARAN STATUS ===== */
+        .pendaftaran-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pendaftaran-table td {
+            font-size: 13.5px;
+            color: #222;
+            padding: 4px 0;
+            vertical-align: middle;
+        }
+
+        .pend-ekskul {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .pend-dash {
+            color: #888;
+            padding: 0 6px;
+        }
+
+        .pend-status {
+            font-weight: 700;
+        }
+
+        .pend-reason {
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* ===== NILAI SISWA ===== */
+        .nilai-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .nilai-table td {
+            font-size: 13.5px;
+            color: #222;
+            padding: 4px 0;
+            vertical-align: middle;
+        }
+
+        .nilai-ekskul {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .nilai-dash {
+            color: #888;
+            padding: 0 6px;
+        }
+
+        .nilai-grade {
+            font-weight: 700;
+        }
+
+        .grade-a {
+            background: #dcfce7;
+            color: #166534;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .grade-b {
+            background: #dbeafe;
+            color: #1e40af;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .grade-c {
+            background: #fef3c7;
+            color: #b45309;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
         /* ===== TWO COL ===== */
         .two-col {
             display: grid;
@@ -621,6 +732,71 @@
                     @endforelse
                 </table>
             </div>
+
+            <!-- Status Pendaftaran -->
+            @if($statusPendaftaran->count() > 0)
+            <div class="card">
+                <div class="card-title">Status Pendaftaran</div>
+                <table class="pendaftaran-table">
+                    @forelse ($statusPendaftaran as $pend)
+                    <tr>
+                        <td class="pend-ekskul">{{ $pend->ekskul->nama ?? 'N/A' }}</td>
+                        <td class="pend-dash">—</td>
+                        <td class="pend-status">
+                            @if($pend->status === 'menunggu')
+                                <span class="status-badge badge-pending">Menunggu</span>
+                            @elseif($pend->status === 'disetujui')
+                                <span class="status-badge badge-accepted">Disetujui</span>
+                            @elseif($pend->status === 'ditolak')
+                                <span class="status-badge badge-rejected">Ditolak</span>
+                            @endif
+                        </td>
+                        @if($pend->status === 'ditolak' && $pend->catatan_admin)
+                        <td class="pend-dash">—</td>
+                        <td class="pend-reason" title="{{ $pend->catatan_admin }}">
+                            {{ Str::limit($pend->catatan_admin, 30) }}
+                        </td>
+                        @endif
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #777; padding: 10px;">Belum ada status pendaftaran.</td>
+                    </tr>
+                    @endforelse
+                </table>
+            </div>
+            @endif
+
+            <!-- Nilai Siswa -->
+            @if($nilaiSiswa->count() > 0)
+            <div class="card">
+                <div class="card-title"><span style="font-size:17px;">⭐</span> Nilai Saya</div>
+                <table class="nilai-table">
+                    @forelse ($nilaiSiswa as $nilai)
+                    <tr>
+                        <td class="nilai-ekskul">{{ $nilai->ekskul->nama ?? 'N/A' }}</td>
+                        <td class="nilai-dash">—</td>
+                        <td class="nilai-grade">
+                            @if($nilai->nilai === 'A')
+                                <span class="grade-a">A (Sangat Baik)</span>
+                            @elseif($nilai->nilai === 'B')
+                                <span class="grade-b">B (Baik)</span>
+                            @elseif($nilai->nilai === 'C')
+                                <span class="grade-c">C (Cukup)</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @if($nilai->keterangan)
+                    <tr>
+                        <td colspan="2"></td>
+                        <td style="font-size: 12px; color: #666; font-style: italic; padding-top: 2px;">{{ $nilai->keterangan }}</td>
+                    </tr>
+                    @endif
+                    @empty
+                    @endforelse
+                </table>
+            </div>
+            @endif
 
             <!-- Jadwal + Pengumuman -->
             <div class="two-col">

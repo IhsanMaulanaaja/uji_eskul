@@ -457,6 +457,14 @@
                         <span class="nav-icon"><i class="fas fa-medal"></i></span>
                         Kegiatan &amp; Prestasi
                     </a>
+                    <a class="nav-item" href="{{ route('pengumuman.index') }}">
+                        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                        Pengumuman
+                    </a>
+                    <a class="nav-item" href="{{ route('nilai.index') }}">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        Nilai Siswa
+                    </a>
                 @else
                     <!-- ADMIN SIDEBAR -->
                     <a class="nav-item" href="{{ route('dashboard-admin') }}">
@@ -507,11 +515,13 @@
 
             <div class="header-actions">
                 <h1>Jadwal Latihan</h1>
+                @if($user?->role === 'pembina')
                 <div class="btn-group">
                     <a href="{{ route('jadwal.create') }}" class="btn-action">
                         <i class="fas fa-plus"></i> Tambah Jadwal
                     </a>
                 </div>
+                @endif
             </div>
 
             @if(session('success'))
@@ -537,8 +547,10 @@
                                 <th style="width: 20%;">Ekstrakurikuler</th>
                                 <th style="width: 15%;">Hari</th>
                                 <th style="width: 15%;">Jam</th>
-                                <th style="width: 25%;">Lokasi</th>
+                                <th style="{{ $user?->role === 'pembina' ? 'width: 25%;' : 'width: 45%;' }}">Lokasi</th>
+                                @if($user?->role === 'pembina')
                                 <th style="width: 20%;">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -549,6 +561,7 @@
                                     <td>{{ ucfirst($j->hari) }}</td>
                                     <td>{{ substr($j->jam_mulai, 0, 5) }} - {{ substr($j->jam_selesai, 0, 5) }}</td>
                                     <td>{{ $j->lokasi }}</td>
+                                    @if($user?->role === 'pembina')
                                     <td>
                                         <div class="aksi-buttons">
                                             <a href="{{ route('jadwal.edit', $j->id) }}" class="btn-tiny btn-edit">
@@ -565,6 +578,7 @@
                                             </form>
                                         </div>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>

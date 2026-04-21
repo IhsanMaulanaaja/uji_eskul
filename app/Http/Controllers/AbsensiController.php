@@ -67,8 +67,21 @@ class AbsensiController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (auth()->user()?->role !== 'admin') {
+        $user = auth()->user();
+        
+        // Hanya admin dan pembina yang bisa update
+        if ($user?->role !== 'admin' && $user?->role !== 'pembina') {
             abort(403);
+        }
+        
+        // Jika pembina, cek apakah absensi tersebut milik ekskul yang dia bina
+        if ($user?->role === 'pembina') {
+            $absensi = Absensi::findOrFail($id);
+            $ekskulIds = Ekstrakurikuler::where('pembina_id', $user->id)->pluck('id');
+            
+            if (!$ekskulIds->contains($absensi->ekskul_id)) {
+                abort(403);
+            }
         }
         
         $request->validate([
@@ -87,51 +100,74 @@ class AbsensiController extends Controller
 
     public function siswa()
     {
-        $user = auth()->user();
-        
-        // Ambil daftar ekskul yang diikuti oleh siswa
-        $ekskulDikuti = DB::table('anggota_ekskul')
-            ->join('ekstrakurikuler', 'anggota_ekskul.ekskul_id', '=', 'ekstrakurikuler.id')
-            ->where('anggota_ekskul.user_id', $user->id)
-            ->where('anggota_ekskul.status', 'aktif')
-            ->select('ekstrakurikuler.*')
-            ->get();
-
-        // Ambil data jadwal untuk setiap ekskul
-        $jadwalMap = [];
-        foreach ($ekskulDikuti as $ekskul) {
-            $jadwalMap[$ekskul->id] = DB::table('jadwal_ekskul')
-                ->where('ekskul_id', $ekskul->id)
+        try {
+            $user = auth()->user();
+            
+            // DEBUG: Return error jika user tidak terdefinisi
+            if (!$user) {
+                return view('absensi-ekskul-siswa', [
+                    'ekskulDikuti' => collect(),
+                    'jadwalMap' => [],
+                    'hariIniIndonesia' => now()->format('l'),
+                    'tanggalHariIni' => now()->format('d F Y'),
+                    'hariIniLower' => strtolower(now()->format('l')),
+                    'error' => 'User tidak terlogin'
+                ]);
+            }
+            
+            // Ambil daftar ekskul yang diikuti oleh siswa dengan status aktif
+            $ekskulDikuti = DB::table('anggota_ekskul')
+                ->join('ekstrakurikuler', 'anggota_ekskul.ekskul_id', '=', 'ekstrakurikuler.id')
+                ->where('anggota_ekskul.user_id', $user->id)
+                ->where('anggota_ekskul.status', 'aktif')
+                ->select('ekstrakurikuler.*')
                 ->get();
+
+            // Ambil data jadwal untuk setiap ekskul
+            $jadwalMap = [];
+            foreach ($ekskulDikuti as $ekskul) {
+                $jadwalMap[$ekskul->id] = DB::table('jadwal_ekskul')
+                    ->where('ekskul_id', $ekskul->id)
+                    ->get();
+            }
+
+            // Hari hari ini dalam format lowercase Indonesia
+            $hariIniMapping = [
+                'Monday' => 'senin',
+                'Tuesday' => 'selasa',
+                'Wednesday' => 'rabu',
+                'Thursday' => 'kamis',
+                'Friday' => 'jumat',
+                'Saturday' => 'sabtu',
+                'Sunday' => 'minggu',
+            ];
+            $hariIni = now()->format('l');
+            $hariIniLower = $hariIniMapping[$hariIni] ?? 'senin';
+            
+            // Nama hari Indonesia untuk tampilan
+            $hariIniIndonesia = [
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu',
+                'Sunday' => 'Minggu',
+            ][$hariIni] ?? 'Senin';
+            
+            $tanggalHariIni = now()->format('d F Y');
+
+            return view('absensi-ekskul-siswa', compact('ekskulDikuti', 'jadwalMap', 'hariIniIndonesia', 'tanggalHariIni', 'hariIniLower'));
+        } catch (\Exception $e) {
+            return view('absensi-ekskul-siswa', [
+                'ekskulDikuti' => collect(),
+                'jadwalMap' => [],
+                'hariIniIndonesia' => now()->format('l'),
+                'tanggalHariIni' => now()->format('d F Y'),
+                'hariIniLower' => strtolower(now()->format('l')),
+                'error' => 'Error: ' . $e->getMessage()
+            ]);
         }
-
-        // Hari hari ini dalam format lowercase Indonesia
-        $hariIniMapping = [
-            'Monday' => 'senin',
-            'Tuesday' => 'selasa',
-            'Wednesday' => 'rabu',
-            'Thursday' => 'kamis',
-            'Friday' => 'jumat',
-            'Saturday' => 'sabtu',
-            'Sunday' => 'minggu',
-        ];
-        $hariIni = now()->format('l');
-        $hariIniLower = $hariIniMapping[$hariIni];
-        
-        // Nama hari Indonesia untuk tampilan
-        $hariIniIndonesia = [
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            'Saturday' => 'Sabtu',
-            'Sunday' => 'Minggu',
-        ][$hariIni];
-        
-        $tanggalHariIni = now()->format('d F Y');
-
-        return view('absensi-ekskul-siswa', compact('ekskulDikuti', 'jadwalMap', 'hariIniIndonesia', 'tanggalHariIni', 'hariIniLower'));
     }
 
     public function storeSiswa(Request $request)
@@ -141,10 +177,13 @@ class AbsensiController extends Controller
         $request->validate([
             'ekskul_id' => 'required|exists:ekstrakurikuler,id',
             'status' => 'required|in:hadir,izin,sakit,alfa',
-            'keterangan' => 'nullable|string'
+            'keterangan' => 'nullable|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'accuracy' => 'nullable|numeric|min:0'
         ]);
 
-        // Cek apakah siswa memang anggota ekskul tersebut
+        // Cek apakah siswa memang anggota ekskul tersebut dengan status aktif
         $isAnggota = DB::table('anggota_ekskul')
             ->where('user_id', $user->id)
             ->where('ekskul_id', $request->ekskul_id)
@@ -152,7 +191,7 @@ class AbsensiController extends Controller
             ->exists();
 
         if (!$isAnggota) {
-            return back()->with('error', 'Anda tidak terdaftar di ekskul ini.');
+            return back()->with('error', 'Anda tidak terdaftar di ekstrakurikuler ini atau status tidak aktif.');
         }
 
         // Cek apakah sudah absen hari ini untuk ekskul tersebut
@@ -171,7 +210,11 @@ class AbsensiController extends Controller
             'ekskul_id' => $request->ekskul_id,
             'tanggal' => $today,
             'status' => $request->status,
-            'keterangan' => $request->keterangan
+            'keterangan' => $request->keterangan,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'accuracy' => $request->accuracy,
+            'gps_timestamp' => now()
         ]);
 
         return back()->with('success', 'Absensi berhasil disimpan!');

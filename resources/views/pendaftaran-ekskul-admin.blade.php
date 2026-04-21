@@ -395,6 +395,88 @@
             background: #ef4444;
         }
 
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #222;
+        }
+
+        .form-group-modal {
+            margin-bottom: 16px;
+        }
+
+        .form-group-modal label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-save {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-save:hover {
+            background: #dc2626;
+        }
+
         /* ===== EKSKUL SECTION ===== */
         .ekskul-section {
             margin-bottom: 24px;
@@ -685,6 +767,14 @@
                 <span class="nav-icon"><i class="fas fa-medal"></i></span>
                 Kegiatan & Prestasi
             </a>
+            <a class="nav-item" href="{{ route('pengumuman.index') }}">
+                <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                Pengumuman
+            </a>
+            <a class="nav-item" href="{{ route('nilai.index') }}">
+                <span class="nav-icon"><i class="fas fa-star"></i></span>
+                Nilai Siswa
+            </a>
         </nav>
 
          <div class="logout-area">
@@ -815,26 +905,22 @@
                                         <td>{{ $pd->alasan ?? '-' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($pd->tanggal_daftar)->translatedFormat('d F Y') }}</td>
                                         <td>
-                                            @if ($pd->status == 'menunggu')
-                                                <div class="action-btns">
-                                                    <form action="{{ route('pendaftaran.status', $pd->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="status" value="disetujui">
-                                                        <button type="submit" class="action-btn btn-check" title="Terima"><i
-                                                                class="fas fa-check"></i></button>
-                                                    </form>
-                                                    <form action="{{ route('pendaftaran.status', $pd->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="status" value="ditolak">
-                                                        <button type="submit" class="action-btn btn-cross" title="Tolak"><i
-                                                                class="fas fa-times"></i></button>
-                                                    </form>
-                                                </div>
+                                            @if($user?->role === 'pembina')
+                                                @if ($pd->status == 'menunggu')
+                                                    <div class="action-btns">
+                                                        <form action="{{ route('pendaftaran.status', $pd->id) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <input type="hidden" name="status" value="disetujui">
+                                                            <button type="submit" class="action-btn btn-check" title="Terima"><i class="fas fa-check"></i></button>
+                                                        </form>
+                                                        <button type="button" class="action-btn btn-cross" title="Tolak" onclick="openRejectModal('{{ $pd->id }}', '{{ $pd->user->name }}')"><i class="fas fa-times"></i></button>
+                                                    </div>
+                                                @else
+                                                    <span style="font-weight: 800; color: {{ $pd->status == 'disetujui' ? '#22c55e' : '#ef4444' }};">{{ ucfirst($pd->status) }}</span>
+                                                @endif
                                             @else
-                                                <span
-                                                    style="font-size: 12px; font-weight:800; color: {{ $pd->status == 'disetujui' ? '#22c55e' : '#ef4444' }}">{{ ucfirst($pd->status) }}</span>
+                                                <span style="font-weight: 800; color: {{ $pd->status == 'disetujui' ? '#22c55e' : ($pd->status == 'ditolak' ? '#ef4444' : '#fbbf24') }};">{{ ucfirst($pd->status) }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -934,6 +1020,18 @@
     </main>
 
     <script>
+        function openRejectModal(pendaftaranId, studentName) {
+            document.getElementById('rejectModal').style.display = 'flex';
+            const baseUrl = window.location.origin;
+            document.getElementById('rejectForm').action = baseUrl + '/pendaftaran-ekskul/' + pendaftaranId + '/status';
+            document.getElementById('studentNameDisplay').textContent = studentName;
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            document.getElementById('alasanPenolakan').value = '';
+        }
+
         function filterEkskul(buttonElement, ekskulId) {
             // Remove active class dari semua tombol
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -954,6 +1052,29 @@
             });
         }
     </script>
+
+    <!-- Reject Modal -->
+    @if($user?->role === 'pembina')
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">Tolak Pendaftaran <span id="studentNameDisplay"></span></div>
+            <form id="rejectForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="status" value="ditolak">
+                <div class="form-group-modal">
+                    <label for="alasanPenolakan">Alasan Penolakan</label>
+                    <textarea name="alasan_penolakan" id="alasanPenolakan" class="form-control" rows="4" 
+                        placeholder="Jelaskan alasan penolakan pendaftaran..." required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeRejectModal()">Batal</button>
+                    <button type="submit" class="btn-save">Tolak</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 
     </div><!-- Close app-container -->
 

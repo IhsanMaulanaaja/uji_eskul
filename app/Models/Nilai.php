@@ -4,16 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Absensi extends Model
+class Nilai extends Model
 {
-    protected $table = 'absensi';
+    protected $table = 'nilai';
     protected $guarded = ['id'];
-    protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float',
-        'accuracy' => 'float',
-        'gps_timestamp' => 'datetime',
-    ];
 
     public function user()
     {

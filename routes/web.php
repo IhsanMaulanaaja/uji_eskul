@@ -42,6 +42,7 @@ Route::post('/pendaftaran-ekskul', [PendaftaranController::class, 'store'])->mid
 use App\Http\Controllers\AbsensiController;
 Route::get('/absensi-ekskul', [AbsensiController::class, 'index'])->middleware(['auth', 'verified'])->name('absensi-admin');
 Route::put('/absensi-ekskul/{id}', [AbsensiController::class, 'update'])->middleware(['auth', 'verified'])->name('absensi.update');
+Route::get('/absensi-test', function() { return view('absensi-test-debug'); })->middleware(['auth', 'verified'])->name('absensi-test');
 Route::get('/absensi-siswa', [AbsensiController::class, 'siswa'])->middleware(['auth', 'verified'])->name('absensi-siswa');
 Route::post('/absensi-siswa', [AbsensiController::class, 'storeSiswa'])->middleware(['auth', 'verified'])->name('absensi-siswa.store');
 
@@ -97,6 +98,21 @@ Route::put('/prestasi-ekskul/lomba/{id}', [PrestasiController::class, 'updateLom
 Route::delete('/prestasi-ekskul/lomba/{id}', [PrestasiController::class, 'destroyLomba'])
     ->middleware(['auth', 'verified'])
     ->name('lomba.destroy');
+
+// PENGUMUMAN EKSKUL
+use App\Http\Controllers\PengumumanController;
+Route::get('/pengumuman-ekskul', [PengumumanController::class, 'index'])->middleware(['auth', 'verified'])->name('pengumuman.index');
+Route::get('/pengumuman-ekskul/create', [PengumumanController::class, 'create'])->middleware(['auth', 'verified'])->name('pengumuman.create');
+Route::post('/pengumuman-ekskul', [PengumumanController::class, 'store'])->middleware(['auth', 'verified'])->name('pengumuman.store');
+Route::get('/pengumuman-ekskul/{id}/edit', [PengumumanController::class, 'edit'])->middleware(['auth', 'verified'])->name('pengumuman.edit');
+Route::put('/pengumuman-ekskul/{id}', [PengumumanController::class, 'update'])->middleware(['auth', 'verified'])->name('pengumuman.update');
+Route::delete('/pengumuman-ekskul/{id}', [PengumumanController::class, 'destroy'])->middleware(['auth', 'verified'])->name('pengumuman.destroy');
+
+// NILAI SISWA
+use App\Http\Controllers\NilaiController;
+Route::get('/nilai-ekskul', [NilaiController::class, 'index'])->middleware(['auth', 'verified'])->name('nilai.index');
+Route::post('/nilai-ekskul/input', [NilaiController::class, 'inputNilai'])->middleware(['auth', 'verified'])->name('nilai.input');
+Route::delete('/nilai-ekskul/{id}', [NilaiController::class, 'destroy'])->middleware(['auth', 'verified'])->name('nilai.destroy');
 
 Route::get('/prestasi-detail-siswa', [PrestasiController::class, 'detailSiswa'])
     ->middleware(['auth', 'verified'])

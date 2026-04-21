@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
     <style>
         /* ===== RESET ===== */
         * {
@@ -590,6 +591,115 @@
             font-size: 12px;
             font-weight: 700;
         }
+
+        /* ===== GPS LOCATION BUTTON ===== */
+        .btn-lokasi {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s;
+        }
+
+        .btn-lokasi:hover {
+            background: #059669;
+        }
+
+        .btn-lokasi:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* ===== LOCATION MODAL ===== */
+        .location-modal-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .location-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .location-modal-header h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #222;
+            margin: 0;
+        }
+
+        .location-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .location-close-btn:hover {
+            color: #333;
+        }
+
+        .location-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .location-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .location-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .location-info-label {
+            font-weight: 700;
+            color: #333;
+            min-width: 100px;
+        }
+
+        .location-map {
+            width: 100%;
+            height: 400px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            margin-bottom: 16px;
+            z-index: 1;
+        }
     </style>
 </head>
 
@@ -639,6 +749,14 @@
                     <a class="nav-item" href="{{ route('prestasi-admin') }}">
                         <span class="nav-icon"><i class="fas fa-medal"></i></span>
                         Kegiatan &amp; Prestasi
+                    </a>
+                    <a class="nav-item" href="{{ route('pengumuman.index') }}">
+                        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                        Pengumuman
+                    </a>
+                    <a class="nav-item" href="{{ route('nilai.index') }}">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        Nilai Siswa
                     </a>
                 @else
                     <!-- ADMIN SIDEBAR -->
@@ -753,7 +871,10 @@
                                     <th>Kelas</th>
                                     <th>Status</th>
                                     <th>Keterangan</th>
+                                    <th>Lokasi</th>
+                                    @if($user?->role === 'pembina')
                                     <th>Aksi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -774,9 +895,21 @@
                                             @endif
                                         </td>
                                         <td>{{ $absensi->keterangan ?? '-' }}</td>
+                                        <td>
+                                            @if ($absensi->latitude && $absensi->longitude)
+                                                <button type="button" class="btn-lokasi" 
+                                                    onclick="openLocationModal('{{ $absensi->id }}', '{{ $absensi->user->name }}', '{{ $absensi->latitude }}', '{{ $absensi->longitude }}', '{{ $absensi->accuracy ?? '' }}', '{{ $absensi->gps_timestamp ?? '' }}')">
+                                                    <i class="fas fa-map-pin"></i> Lihat
+                                                </button>
+                                            @else
+                                                <span style="color: #999; font-size: 12px;">Tidak ada data</span>
+                                            @endif
+                                        </td>
+                                        @if($user?->role === 'pembina')
                                         <td><button type="button" class="btn-edit"
                                                 onclick="openModal('{{ $absensi->id }}', '{{ $absensi->status }}', '{{ addslashes($absensi->keterangan) }}')">Edit</button>
                                         </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -823,6 +956,7 @@
         </main>
     </div>
 
+    @if($user?->role === 'pembina')
     <!-- Edit Modal -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-content">
@@ -851,8 +985,42 @@
             </form>
         </div>
     </div>
+    @endif
 
+    <!-- Location Map Modal -->
+    <div class="modal-overlay" id="locationModal">
+        <div class="location-modal-content">
+            <div class="location-modal-header">
+                <h2><i class="fas fa-map-pin"></i> Lokasi Absensi - <span id="locationSiswaName"></span></h2>
+                <button class="location-close-btn" onclick="closeLocationModal()">&times;</button>
+            </div>
+
+            <div class="location-info">
+                <div class="location-info-item">
+                    <span class="location-info-label">Latitude:</span>
+                    <span id="locationLatitude">-</span>
+                </div>
+                <div class="location-info-item">
+                    <span class="location-info-label">Longitude:</span>
+                    <span id="locationLongitude">-</span>
+                </div>
+                <div class="location-info-item">
+                    <span class="location-info-label">Akurasi:</span>
+                    <span id="locationAccuracy">-</span>
+                </div>
+                <div class="location-info-item">
+                    <span class="location-info-label">Waktu:</span>
+                    <span id="locationTimestamp">-</span>
+                </div>
+            </div>
+
+            <div id="locationMap" class="location-map"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <script>
+        @if($user?->role === 'pembina')
         function openModal(id, status, keterangan) {
             document.getElementById('editModal').style.display = 'flex';
             document.getElementById('editForm').action = '/absensi-ekskul/' + id;
@@ -863,6 +1031,7 @@
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
         }
+        @endif
 
         function filterEkskul(buttonElement, ekskulId) {
             // Remove active class dari semua tombol
@@ -883,6 +1052,71 @@
                 }
             });
         }
+
+        // Location Modal Functions
+        let locationMap = null;
+        let locationMarker = null;
+
+        function openLocationModal(absentiId, siswaName, latitude, longitude, accuracy, timestamp) {
+            document.getElementById('locationModal').style.display = 'flex';
+            document.getElementById('locationSiswaName').textContent = siswaName;
+            document.getElementById('locationLatitude').textContent = parseFloat(latitude).toFixed(8);
+            document.getElementById('locationLongitude').textContent = parseFloat(longitude).toFixed(8);
+            document.getElementById('locationAccuracy').textContent = accuracy ? parseFloat(accuracy).toFixed(2) + ' meter' : 'N/A';
+            document.getElementById('locationTimestamp').textContent = timestamp ? new Date(timestamp).toLocaleString('id-ID') : 'N/A';
+
+            // Initialize map if not exists or update
+            setTimeout(() => {
+                if (locationMap) {
+                    locationMap.remove();
+                }
+
+                locationMap = L.map('locationMap').setView([latitude, longitude], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(locationMap);
+
+                if (locationMarker) {
+                    locationMap.removeLayer(locationMarker);
+                }
+
+                locationMarker = L.circleMarker([latitude, longitude], {
+                    color: '#ef4444',
+                    fillColor: '#ef4444',
+                    fillOpacity: 0.7,
+                    radius: 14,
+                    weight: 3
+                }).addTo(locationMap).bindPopup('<strong>' + siswaName + '</strong><br>Lokasi Absensi').openPopup();
+
+                // Add a larger accuracy circle if accuracy data exists
+                if (accuracy && accuracy > 0) {
+                    L.circle([latitude, longitude], {
+                        color: '#3b82f6',
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.2,
+                        radius: parseFloat(accuracy),
+                        weight: 2,
+                        dashArray: '5, 5'
+                    }).addTo(locationMap);
+                }
+            }, 100);
+        }
+
+        function closeLocationModal() {
+            document.getElementById('locationModal').style.display = 'none';
+            if (locationMap) {
+                locationMap.remove();
+                locationMap = null;
+            }
+        }
+
+        // Close location modal when overlay is clicked
+        document.getElementById('locationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLocationModal();
+            }
+        });
     </script>
 </body>
 

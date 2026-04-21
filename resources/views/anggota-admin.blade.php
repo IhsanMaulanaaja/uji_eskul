@@ -579,6 +579,14 @@
                         <span class="nav-icon"><i class="fas fa-medal"></i></span>
                         Kegiatan &amp; Prestasi
                     </a>
+                    <a class="nav-item" href="{{ route('pengumuman.index') }}">
+                        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                        Pengumuman
+                    </a>
+                    <a class="nav-item" href="{{ route('nilai.index') }}">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        Nilai Siswa
+                    </a>
                 @else
                     <!-- ADMIN SIDEBAR -->
                     <a class="nav-item" href="{{ route('dashboard-admin') }}">

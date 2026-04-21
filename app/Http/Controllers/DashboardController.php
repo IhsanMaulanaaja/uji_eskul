@@ -105,7 +105,13 @@ class DashboardController extends Controller
                 ->count();
         }
 
-        // 6. Ambil Pengumuman (UMUM + sesuai ekskul yang diikuti)
+        // 6. Ambil Status Pendaftaran (menunggu, disetujui, ditolak)
+        $statusPendaftaran = Pendaftaran::with('ekskul')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // 7. Ambil Pengumuman (UMUM + sesuai ekskul yang diikuti)
         $pengumuman = DB::table('pengumuman')
             ->where(function($query) use ($ekskulIds) {
                 $query->whereNull('ekskul_id')
@@ -115,6 +121,22 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // 8. Ambil Nilai Siswa (untuk ekskul yang diikuti)
+        $nilaiSiswa = collect();
+        if (!empty($ekskulIds)) {
+            $nilaiSiswa = DB::table('nilai')
+                ->join('ekstrakurikuler', 'nilai.ekskul_id', '=', 'ekstrakurikuler.id')
+                ->where('nilai.user_id', $user->id)
+                ->whereIn('nilai.ekskul_id', $ekskulIds)
+                ->select('nilai.*', 'ekstrakurikuler.nama as ekskul_name')
+                ->get()
+                ->map(function($item) {
+                    return (object)array_merge((array)$item, [
+                        'ekskul' => (object)['nama' => $item->ekskul_name]
+                    ]);
+                });
+        }
+
         return view('dashboard-siswa', compact(
             'ekskulSiswa', 
             'jadwalTerdekat', 
@@ -122,7 +144,9 @@ class DashboardController extends Controller
             'namaBulanShort', 
             'tanggalHariIni',
             'jumlahPrestasi',
-            'pengumuman'
+            'pengumuman',
+            'statusPendaftaran',
+            'nilaiSiswa'
         ));
     }
 

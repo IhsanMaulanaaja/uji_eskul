@@ -141,7 +141,19 @@ class PendaftaranController extends Controller
             }
         }
 
-        $pendaftaran->update(['status' => $request->status]);
+        $request->validate([
+            'status' => 'required|in:disetujui,ditolak',
+            'alasan_penolakan' => 'required_if:status,ditolak|nullable|string'
+        ]);
+
+        $updateData = ['status' => $request->status];
+        
+        // Jika ditolak, simpan alasan penolakan
+        if ($request->status === 'ditolak') {
+            $updateData['catatan_admin'] = $request->alasan_penolakan;
+        }
+        
+        $pendaftaran->update($updateData);
 
         if ($request->status === 'disetujui') {
             AnggotaEkskul::firstOrCreate([

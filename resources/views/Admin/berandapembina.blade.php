@@ -410,6 +410,14 @@
                     <span class="nav-icon"><i class="fas fa-trophy"></i></span>
                     Kegiatan & Prestasi
                 </a>
+                <a class="nav-item {{ request()->routeIs('pengumuman.index') ? 'active' : '' }}" href="{{ route('pengumuman.index') }}">
+                    <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                    Pengumuman
+                </a>
+                <a class="nav-item {{ request()->routeIs('nilai.index') ? 'active' : '' }}" href="{{ route('nilai.index') }}">
+                    <span class="nav-icon"><i class="fas fa-star"></i></span>
+                    Nilai Siswa
+                </a>
             </nav>
 
             <div class="logout-area">

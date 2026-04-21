@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSchool Ekskul - Absensi Ekskul</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <title>SmartSchool - Absensi Ekskul</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #dce3ea;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        html {
+            width: 100%;
+            height: 100%;
         }
 
-        /* ===== TOP NAVBAR ===== */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #dce3ea;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== TOP NAVIGATION ===== */
         .topnav {
             background: #f5f0e8;
             display: flex;
@@ -31,8 +36,9 @@
             justify-content: space-between;
             padding: 0 28px;
             height: 62px;
-            position: sticky;
+            position: fixed;
             top: 0;
+            width: 100%;
             z-index: 200;
             border-bottom: 1px solid #e0dbd0;
         }
@@ -49,18 +55,6 @@
             color: #1c1c1c;
         }
 
-        .topnav-right {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .bell-icon {
-            font-size: 22px;
-            color: #222;
-            cursor: pointer;
-        }
-
         .user-btn {
             background: #3a7bd5;
             color: #fff;
@@ -69,37 +63,75 @@
             padding: 9px 22px;
             font-size: 17px;
             font-weight: 800;
-            font-family: 'Nunito', sans-serif;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
-        /* ===== LAYOUT ===== */
         .app-body {
+            position: fixed;
+            top: 62px;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
-            flex: 1;
         }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 165px;
+            width: 235px;
             background: #a8c4d8;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 24px 14px 20px;
-            min-height: calc(100vh - 62px);
             flex-shrink: 0;
-            position: sticky;
-            top: 62px;
-            height: calc(100vh - 62px);
+            height: 100%;
             overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 100;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 126px;
+            height: 126px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .logo-wrapper svg.dashed-circle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 126px;
+            height: 126px;
+        }
+
+        .logo-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+            z-index: 1;
+        }
+
+        .logo-icons .top-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 0px;
+        }
+
+        .logo-icons .icon-grad {
+            font-size: 46px;
+            line-height: 1;
+            margin: -4px 0 -2px;
         }
 
         .sidebar-title {
-            font-size: 13px;
+            font-size: 14.5px;
             font-weight: 800;
             color: #1a1a1a;
             text-align: center;
@@ -125,10 +157,11 @@
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
+            gap: 12px;
+            padding: 11px 16px;
             border-radius: 10px;
-            font-size: 14px;
+            cursor: pointer;
+            font-size: 15.5px;
             font-weight: 600;
             color: #1a1a2e;
             text-decoration: none;
@@ -140,8 +173,8 @@
         }
 
         .nav-item.active {
-            background: #5b8deb;
-            color: #fff;
+            background: #ffffff;
+            color: #1a1a1a;
             font-weight: 700;
         }
 
@@ -181,376 +214,274 @@
             background: #c1121f;
         }
 
-        /* ===== MAIN ===== */
+        /* ===== MAIN CONTENT ===== */
         .main {
             flex: 1;
-            padding: 24px 28px;
+            padding: 40px 24px;
             display: flex;
-            align-items: flex-start;
             justify-content: center;
+            align-items: flex-start;
             background: #dce3ea;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 100%;
         }
 
-        /* ===== CARD ===== */
-        .form-card {
+        .card {
             background: #fff;
             border-radius: 14px;
-            padding: 28px 32px;
+            padding: 32px;
             width: 100%;
-            max-width: 920px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        }
-
-        .form-card h1 {
-            font-size: 22px;
-            font-weight: 900;
-            color: #111;
-            margin-bottom: 6px;
-        }
-
-        .divider-line {
-            border: none;
-            border-top: 1px solid #e2e8f0;
-            margin-bottom: 24px;
-        }
-
-        /* ===== TWO COLUMN ===== */
-        .two-col-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-            margin-bottom: 28px;
-        }
-
-        /* ===== SECTION TITLE ===== */
-        .section-title {
-            font-size: 17px;
-            font-weight: 800;
-            color: #111;
-            margin-bottom: 14px;
-        }
-
-        /* ===== INPUT FIELD ===== */
-        .input-row {
-            display: flex;
-            align-items: center;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 14px;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .input-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .input-row .input-icon {
-            font-size: 18px;
-            color: #5b8deb;
+            max-width: 620px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
 
-        .input-row input {
-            border: none;
-            background: transparent;
-            font-family: 'Nunito', sans-serif;
+        .card h1 {
+            font-size: 22px;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 24px;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
             font-size: 14px;
-            color: #555;
-            outline: none;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        select,
+        textarea {
             width: 100%;
-        }
-
-        /* ===== ABSENSI KEHADIRAN (right column) ===== */
-        .absensi-kehadiran-col .section-title {
-            margin-bottom: 12px;
-        }
-
-        .status-dropdown {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f1f5f9;
+            padding: 11px 12px;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 14px;
+            border-radius: 6px;
+            font-family: inherit;
             font-size: 14px;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 10px;
-            cursor: pointer;
+            background: #fff;
         }
 
-        .radio-list {
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: none;
+        }
+
+        /* ===== RADIO BUTTONS ===== */
+        .radio-group {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 10px 14px;
-            margin-bottom: 14px;
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .radio-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 6px 0;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #fff;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 85px;
             font-size: 14px;
             font-weight: 600;
             color: #333;
-            border-bottom: 1px solid #e2e8f0;
         }
 
-        .radio-item:last-child {
-            border-bottom: none;
-        }
-
-        .radio-item input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #5b8deb;
+        .radio-item input {
             cursor: pointer;
+            accent-color: #3b82f6;
         }
 
-        /* ===== KETERANGAN TEXTAREA (right col) ===== */
-        .keterangan-box {
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            overflow: hidden;
+        .radio-item input:checked {
+            accent-color: #3b82f6;
         }
 
-        .keterangan-label {
-            background: #e2e8f0;
-            padding: 8px 12px;
-            font-size: 13px;
+        .radio-item input:checked ~ span {
+            color: #3b82f6;
             font-weight: 700;
-            color: #555;
-            border-bottom: 1px solid #cbd5e1;
         }
 
-        .keterangan-textarea {
-            width: 100%;
-            border: none;
-            padding: 10px 12px;
-            font-family: 'Nunito', sans-serif;
-            font-size: 13px;
-            color: #555;
-            min-height: 72px;
-            outline: none;
+        .radio-item:has(input:checked) {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        /* ===== GPS SECTION ===== */
+        .gps-section {
             background: #f8fafc;
-            resize: none;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 0 0 18px 0;
         }
 
-        /* ===== INFORMASI EKSKUL ===== */
-        .ekskul-info-section {
-            margin-bottom: 28px;
-        }
-
-        .ekskul-select-row {
+        .gps-status {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 14px;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
             margin-bottom: 12px;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
         }
 
-        .ekskul-select-row .ekskul-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .ekskul-select-row select {
-            border: none;
-            background: transparent;
-            font-family: 'Nunito', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            color: #333;
-            outline: none;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .ekskul-select-row .chevron {
-            font-size: 13px;
-            color: #888;
-            flex-shrink: 0;
-        }
-
-        .jadwal-rows {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .jadwal-select-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 14px;
-        }
-
-        .jadwal-select-row .jadwal-icon {
-            font-size: 18px;
-            color: #e63946;
-            flex-shrink: 0;
-        }
-
-        .jadwal-select-row .jadwal-icon.clock {
-            color: #5b8deb;
-        }
-
-        .jadwal-select-row select {
-            border: none;
-            background: transparent;
-            font-family: 'Nunito', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            outline: none;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .jadwal-select-row input[type="text"] {
-            border: none;
-            background: transparent;
-            font-family: 'Nunito', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            outline: none;
-            width: 100%;
-            cursor: default;
-        }
-
-        .jadwal-select-row .chevron {
-            font-size: 13px;
-            color: #888;
-            flex-shrink: 0;
-        }
-
-        /* ===== KEHADIRAN BUTTONS SECTION (bottom) ===== */
-        .bottom-section .section-title {
-            margin-bottom: 14px;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .btn-simpan {
-            background: #5b8deb;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 28px;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .btn-simpan:hover {
-            background: #3a6fd8;
-        }
-
-        .btn-batal {
-            background: #e2e8f0;
-            color: #333;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 28px;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-        }
-
-        .btn-batal:hover {
-            background: #cbd5e1;
-        }
-
-        /* ===== SUCCESS ALERT ===== */
-        .alert-success {
-            display: none;
-            align-items: center;
-            gap: 10px;
+        .gps-status.ready {
             background: #dcfce7;
             border: 1px solid #86efac;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 700;
             color: #166534;
         }
 
-        .alert-success i {
-            font-size: 18px;
-            color: #22c55e;
-            flex-shrink: 0;
+        .gps-map {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            margin: 12px 0;
+        }
+
+        .gps-info {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-block;
+            padding: 11px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #5b8deb;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #3a6fd8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-gps {
+            background: #3b82f6;
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-gps:hover {
+            background: #2563eb;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        /* ===== BUTTON GROUP ===== */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
         }
     </style>
 </head>
-
 <body>
-
-    <!-- TOP NAVBAR -->
     <nav class="topnav">
         <div class="topnav-brand">
-            <img src="{{ asset('assets/image9.png') }}" width="38" height="38" alt="Logo"
-                style="border-radius: 4px;" />
+            <img src="{{ asset("assets/image9.png") }}" width="38" height="38" alt="Logo" style="border-radius: 4px;">
             <div class="brand-text"><b>SmartSchool</b> Ekskul</div>
         </div>
-        <div class="topnav-right">
-            <div class="bell-icon"><i class="fas fa-bell"></i></div>
-            <button class="user-btn">{{ Auth::user()->name }} &nbsp;<i class="fas fa-chevron-down"
-                    style="font-size:13px;"></i></button>
-        </div>
+        <button class="user-btn">{{ Auth::user()->name }}</button>
     </nav>
 
     <div class="app-body">
-
-        <!-- SIDEBAR -->
+        <!-- Sidebar -->
         <aside class="sidebar">
-            <img src="{{ asset('assets/image3.png') }}" width="100" height="100" alt="Logo"
-                style="margin-bottom:8px; border-radius: 6px;" />
+            <img src="{{ asset('assets/image3.png') }}" width="100" height="100" alt="Leaf logo" style="margin-bottom:8px;" />
             <div class="sidebar-title">SmartSchool Ekskul</div>
             <div class="sidebar-divider"></div>
+
             <nav class="sidebar-nav">
-                <a class="nav-item {{ request()->routeIs('dashboard-siswa') ? 'active' : '' }}"
-                    href="{{ route('dashboard-siswa') }}">
+                <a class="nav-item {{ request()->routeIs('dashboard-siswa') ? 'active' : '' }}" href="{{ route('dashboard-siswa') }}">
                     <span class="nav-icon"><i class="fas fa-home"></i></span>
                     Beranda
                 </a>
-                <a class="nav-item {{ request()->routeIs('pilihan-ekskul') ? 'active' : '' }}"
-                    href="{{ route('pilihan-ekskul') }}">
+                <a class="nav-item {{ request()->routeIs('pilihan-ekskul') ? 'active' : '' }}" href="{{ route('pilihan-ekskul') }}">
                     <span class="nav-icon"><i class="fas fa-hand-pointer"></i></span>
                     Pilihan ekskul
                 </a>
-
-                <a class="nav-item {{ request()->routeIs('absensi-siswa') ? 'active' : '' }}"
-                    href="{{ route('absensi-siswa') }}">
+                <a class="nav-item {{ request()->routeIs('absensi-siswa') ? 'active' : '' }}" href="{{ route('absensi-siswa') }}">
                     <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
                     Absensi Ekskul
                 </a>
-                <a class="nav-item {{ request()->routeIs('prestasi-siswa') ? 'active' : '' }}"
-                    href="{{ route('prestasi-siswa') }}">
+                <a class="nav-item {{ request()->routeIs('prestasi-siswa') ? 'active' : '' }}" href="{{ route('prestasi-siswa') }}">
                     <span class="nav-icon"><i class="fas fa-medal"></i></span>
                     Prestasi
                 </a>
             </nav>
+
             <div class="logout-area">
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" style="width: 100%;">
                     @csrf
                     <button type="submit" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -559,132 +490,213 @@
             </div>
         </aside>
 
-        <!-- MAIN -->
+        <!-- Main Content -->
         <main class="main">
-            <div class="form-card">
-                <h1>Absensi Ekskul</h1>
-                <hr class="divider-line">
+            <div class="card">
+                <h1><i class="fas fa-clipboard-list"></i> Absensi Ekskul</h1>
 
-                @if (session('success'))
-                    <div class="alert-success" style="display: flex; margin-bottom: 20px;">
-                        <i class="fas fa-check-circle"></i>
-                        {{ session('success') }}
+                @if(session("success"))
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> {{ session("success") }}
                     </div>
                 @endif
 
-                @if (session('error'))
-                    <div class="alert-error"
-                        style="display: flex; align-items: center; gap: 10px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 700; color: #991b1b; margin-bottom: 20px;">
-                        <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
-                        {{ session('error') }}
+                @if(session("error"))
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> {{ session("error") }}
                     </div>
                 @endif
 
-                <form action="{{ route('absensi-siswa.store') }}" method="POST">
+                <form action="{{ route("absensi-siswa.store") }}" method="POST">
                     @csrf
-                    <!-- TOP TWO-COL: Informasi Siswa | Absensi Kehadiran -->
-                <div class="two-col-layout">
 
-                    <!-- Kiri: Informasi Siswa -->
-                        <div>
-                            <div class="section-title">Informasi Siswa</div>
-                            <div class="input-row">
-                                <span class="input-icon"><i class="fas fa-user-circle"></i></span>
-                                <input type="text" placeholder="Masukan nama anda" value="{{ Auth::user()->name }}"
-                                    readonly>
-                            </div>
-                            <div class="input-row">
-                                <span class="input-icon" style="color:#f59e0b;"><i
-                                        class="fas fa-chalkboard-teacher"></i></span>
-                                <input type="text" placeholder="Masukan kelas anda"
-                                    value="{{ Auth::user()->kelas ?? 'Kelas belum diatur' }}" readonly>
-                            </div>
+                    <!-- GPS Section -->
+                    <div class="gps-section">
+                        <div style="font-weight: 700; margin-bottom: 10px;">
+                            <i class="fas fa-location-dot"></i> Lokasi Absensi (GPS)
                         </div>
-
-                    <!-- Kanan: Absensi Kehadiran -->
-                    <div class="absensi-kehadiran-col">
-                        <div class="section-title">Absensi Kehadiran</div>
-
-                        <div class="status-dropdown">
-                            <span>Pilih status kehadiran</span>
-                            <i class="fas fa-chevron-down" style="font-size:12px; color:#888;"></i>
+                        <div class="gps-status" id="gpsStatus">
+                            <i class="fas fa-spinner"></i> Menunggu lokasi...
                         </div>
-
-                        <div class="radio-list">
-                            <div class="radio-item">
-                                <span>Hadir</span>
-                                <input type="radio" name="status" value="hadir" checked>
-                            </div>
-                            <div class="radio-item">
-                                <span>Izin</span>
-                                <input type="radio" name="status" value="izin">
-                            </div>
-                            <div class="radio-item">
-                                <span>Sakit</span>
-                                <input type="radio" name="status" value="sakit">
-                            </div>
-                            <div class="radio-item">
-                                <span>Alfa</span>
-                                <input type="radio" name="status" value="alfa">
-                            </div>
+                        <div id="gpsMap" class="gps-map"></div>
+                        <div class="gps-info">
+                            <div><i class="fas fa-map-pin"></i> Latitude: <span id="gpsLat">-</span></div>
+                            <div><i class="fas fa-map-pin"></i> Longitude: <span id="gpsLng">-</span></div>
+                            <div><i class="fas fa-map-pin"></i> Akurasi: <span id="gpsAcc">-</span></div>
                         </div>
-
-                        <div class="keterangan-box">
-                            <div class="keterangan-label">Keterangan (optional)</div>
-                            <textarea name="keterangan" class="keterangan-textarea" placeholder="Tulis keterangan jika izin atau tidak hadir..."></textarea>
-                        </div>
+                        <button type="button" class="btn btn-gps" id="captureGpsBtn" onclick="captureGPS(event)">
+                            <i class="fas fa-location-crosshairs"></i> Capture Lokasi
+                        </button>
                     </div>
 
-                </div>
+                    <input type="hidden" name="latitude" id="lat" value="">
+                    <input type="hidden" name="longitude" id="lng" value="">
+                    <input type="hidden" name="accuracy" id="acc" value="">
 
-                    <div class="ekskul-info-section">
-                        <div class="section-title">Informasi Ekskul</div>
-                        <div class="ekskul-select-row">
-                            <span class="ekskul-icon">✨</span>
+                    <!-- Ekstrakurikuler Selection -->
+                    <div class="form-group">
+                        <label class="form-label">Pilih Ekstrakurikuler</label>
+                        @if($ekskulDikuti->count() > 0)
                             <select name="ekskul_id" required>
-                                <option value="" disabled selected>Pilih Ekskul</option>
-                                @foreach ($ekskulDikuti as $ekskul)
+                                <option value="">-- Pilih --</option>
+                                @foreach($ekskulDikuti as $ekskul)
                                     <option value="{{ $ekskul->id }}">{{ $ekskul->nama }}</option>
                                 @endforeach
                             </select>
-                            <i class="fas fa-chevron-down chevron"></i>
-                        </div>
-                        @if ($ekskulDikuti->isEmpty())
-                            <p style="color: #991b1b; font-size: 13px; font-weight: 700; margin-top: -8px;">Anda belum
-                                terdaftar di ekskul mana pun.</p>
+                        @else
+                            <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 6px; padding: 14px; color: #991b1b; margin-bottom: 10px;">
+                                <div style="font-weight: 600; margin-bottom: 6px;">
+                                    <i class="fas fa-exclamation-circle"></i> Anda belum terdaftar ekstrakurikuler
+                                </div>
+                                <p style="font-size: 13px; margin: 0;">
+                                    Silakan 
+                                    <a href="{{ route('pilihan-ekskul') }}" style="color: #3b82f6; text-decoration: underline; font-weight: 600;">daftar ekstrakurikuler</a>
+                                    terlebih dahulu untuk bisa melakukan absensi.
+                                </p>
+                            </div>
+                            <select name="ekskul_id" required disabled style="opacity: 0.5; cursor: not-allowed;">
+                                <option value="">-- Daftar ekstrakurikuler dulu --</option>
+                            </select>
                         @endif
-                    <div class="jadwal-rows">
-                        <div class="jadwal-select-row" style="pointer-events: none; opacity: 0.7;">
-                            <i class="fas fa-calendar-alt jadwal-icon"></i>
-                            <input type="text" value="{{ $hariIniIndonesia }}, {{ $tanggalHariIni }}" readonly style="border: none; background: transparent; font-family: 'Nunito', sans-serif; font-size: 14px; color: #555; outline: none; width: 100%; cursor: default;">
+                    </div>
+
+                    <!-- Attendance Status -->
+                    <div class="form-group">
+                        <label class="form-label">Status Kehadiran</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="status" value="hadir" checked>
+                                <span>Hadir</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="status" value="izin">
+                                <span>Izin</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="status" value="sakit">
+                                <span>Sakit</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="status" value="alfa">
+                                <span>Alfa</span>
+                            </label>
                         </div>
                     </div>
-                </div>
 
-                <!-- Absensi Kehadiran (bottom action buttons) -->
-                    <div class="bottom-section">
-                        <div class="section-title">Absensi Kehadiran</div>
-                        <div class="btn-row">
-                            <button type="submit" class="btn-simpan"
-                                {{ $ekskulDikuti->isEmpty() ? 'disabled' : '' }}>Simpan</button>
-                            <a href="{{ route('dashboard-siswa') }}" class="btn-batal"
-                                style="text-decoration: none; display: inline-block;">Batal</a>
-                        </div>
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-label">Keterangan (Opsional)</label>
+                        <textarea name="keterangan" placeholder="Tulis keterangan jika diperlukan..."></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-floppy-disk"></i> Simpan
+                        </button>
+                        <a href="{{ route("dashboard-siswa") }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
                     </div>
                 </form>
-
             </div>
         </main>
     </div>
 
+    <!-- Leaflet Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <!-- GPS Absensi Script -->
     <script>
-        // Data jadwal dalam format JSON
-        const jadwalMap = @json($jadwalMap ?? []);
-        const hariIniLower = "{{ $hariIniLower }}";
+        let map = null;
 
+        /**
+         * Update GPS status message
+         */
+        function updateGPSStatus(text, isReady = false) {
+            const el = document.getElementById("gpsStatus");
+            el.textContent = text;
+            if (isReady) {
+                el.className = "gps-status ready";
+            }
+        }
 
+        /**
+         * Capture GPS location
+         */
+        function captureGPS(e) {
+            e.preventDefault();
+            updateGPSStatus("Mendapatkan lokasi...");
+
+            if (!navigator.geolocation) {
+                updateGPSStatus("Browser tidak mendukung GPS");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const acc = pos.coords.accuracy;
+
+                    // Set form hidden inputs
+                    document.getElementById("lat").value = lat;
+                    document.getElementById("lng").value = lng;
+                    document.getElementById("acc").value = acc.toFixed(2);
+
+                    // Display coordinates
+                    document.getElementById("gpsLat").textContent = lat.toFixed(8);
+                    document.getElementById("gpsLng").textContent = lng.toFixed(8);
+                    document.getElementById("gpsAcc").textContent = acc.toFixed(2) + "m";
+
+                    updateGPSStatus("Lokasi berhasil didapat", true);
+
+                    // Initialize map
+                    if (map) map.remove();
+                    map = L.map("gpsMap").setView([lat, lng], 17);
+                    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+                    L.circleMarker([lat, lng], {
+                        color: "#3b82f6",
+                        radius: 10,
+                        weight: 3,
+                        fillOpacity: 0.7
+                    }).addTo(map);
+                },
+                function(err) {
+                    let errorMsg = "Gagal mendapatkan lokasi";
+                    if (err.code === 1) {
+                        errorMsg = "Izin GPS ditolak. Aktifkan akses lokasi di browser.";
+                    } else if (err.code === 2) {
+                        errorMsg = "Lokasi tidak tersedia";
+                    } else if (err.code === 3) {
+                        errorMsg = "Permintaan GPS timeout";
+                    }
+                    updateGPSStatus("Error: " + errorMsg);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        /**
+         * Auto-capture GPS on page load
+         */
+        window.addEventListener("load", function() {
+            setTimeout(() => captureGPS({ preventDefault: () => {} }), 500);
+        });
+
+        /**
+         * Validate GPS before form submission
+         */
+        document.querySelector("form").addEventListener("submit", function(e) {
+            if (!document.getElementById("lat").value || !document.getElementById("lng").value) {
+                e.preventDefault();
+                alert("Silakan capture lokasi GPS terlebih dahulu!");
+            }
+        });
     </script>
-
 </body>
-
 </html>
