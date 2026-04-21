@@ -759,18 +759,17 @@
                                 <span class="status-badge badge-accepted">Disetujui</span>
                             @elseif($pend->status === 'ditolak')
                                 <span class="status-badge badge-rejected">Ditolak</span>
+                                @if($pend->catatan_admin)
+                                    <div style="font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 4px;" title="{{ $pend->catatan_admin }}">
+                                        {{ Str::limit($pend->catatan_admin, 40) }}
+                                    </div>
+                                @endif
                             @endif
                         </td>
-                        @if($pend->status === 'ditolak' && $pend->catatan_admin)
-                        <td class="pend-dash">—</td>
-                        <td class="pend-reason" title="{{ $pend->catatan_admin }}">
-                            {{ Str::limit($pend->catatan_admin, 30) }}
-                        </td>
-                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; color: #777; padding: 10px;">Belum ada status pendaftaran.</td>
+                        <td colspan="3" style="text-align: center; color: #777; padding: 10px;">Belum ada status pendaftaran.</td>
                     </tr>
                     @endforelse
                 </table>
