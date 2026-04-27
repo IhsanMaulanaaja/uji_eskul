@@ -115,7 +115,7 @@ class AbsensiController extends Controller
                 ]);
             }
             
-            // Ambil daftar ekskul yang diikuti oleh siswa dengan status aktif
+            // Ambil daftar ekskul yang diikuti oleh siswa
             $ekskulDikuti = DB::table('anggota_ekskul')
                 ->join('ekstrakurikuler', 'anggota_ekskul.ekskul_id', '=', 'ekstrakurikuler.id')
                 ->where('anggota_ekskul.user_id', $user->id)
@@ -183,7 +183,7 @@ class AbsensiController extends Controller
             'accuracy' => 'nullable|numeric|min:0'
         ]);
 
-        // Cek apakah siswa memang anggota ekskul tersebut dengan status aktif
+        // Cek apakah siswa memang anggota ekskul tersebut
         $isAnggota = DB::table('anggota_ekskul')
             ->where('user_id', $user->id)
             ->where('ekskul_id', $request->ekskul_id)
@@ -191,7 +191,7 @@ class AbsensiController extends Controller
             ->exists();
 
         if (!$isAnggota) {
-            return back()->with('error', 'Anda tidak terdaftar di ekstrakurikuler ini atau status tidak aktif.');
+            return back()->with('error', 'Anda tidak terdaftar di ekskul ini.');
         }
 
         // Cek apakah sudah absen hari ini untuk ekskul tersebut

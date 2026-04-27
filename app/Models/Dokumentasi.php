@@ -9,6 +9,8 @@ class Dokumentasi extends Model
 {
     protected $table = 'dokumentasi';
     protected $guarded = ['id'];
+    protected $dates = ['tanggal', 'tanggal_juara'];
+    protected $appends = ['fotoUrl'];
 
     public function lomba()
     {
@@ -26,10 +28,7 @@ class Dokumentasi extends Model
             return asset('images/no-image.png');
         }
 
-        if (Storage::disk('public')->exists($this->foto)) {
-            return Storage::disk('public')->url($this->foto);
-        }
-
-        return asset('images/no-image.png');
+        // Use storage/public URL with /storage prefix
+        return url('storage/' . $this->foto);
     }
 }

@@ -418,29 +418,25 @@
         .ek-name {
             font-weight: 600;
             min-width: 75px;
-            width: 35%;
         }
 
         .ek-dash {
             color: #888;
-            padding: 0 4px;
-            width: 5%;
-            text-align: center;
+            padding: 0 6px;
         }
 
         .ek-schedule {
             color: #333;
-            width: 60%;
         }
 
         .ek-dash2 {
-            display: none;
+            color: #888;
+            padding: 0 6px;
         }
 
         .ek-status {
             font-weight: 800;
             color: #1a1a1a;
-            display: none;
         }
 
         /* ===== PENDAFTARAN STATUS ===== */
@@ -459,19 +455,15 @@
         .pend-ekskul {
             font-weight: 600;
             min-width: 100px;
-            width: 35%;
         }
 
         .pend-dash {
             color: #888;
-            padding: 0 4px;
-            width: 5%;
-            text-align: center;
+            padding: 0 6px;
         }
 
         .pend-status {
             font-weight: 700;
-            width: 60%;
         }
 
         .pend-reason {
@@ -519,19 +511,15 @@
         .nilai-ekskul {
             font-weight: 600;
             min-width: 100px;
-            width: 35%;
         }
 
         .nilai-dash {
             color: #888;
-            padding: 0 4px;
-            width: 5%;
-            text-align: center;
+            padding: 0 6px;
         }
 
         .nilai-grade {
             font-weight: 700;
-            width: 60%;
         }
 
         .grade-a {
@@ -733,7 +721,9 @@
                     <tr>
                         <td class="ek-name">{{ $ekskul->nama }}</td>
                         <td class="ek-dash">—</td>
-                        <td class="ek-schedule">{{ $ekskul->jadwal_lengkap ?? 'Jadwal belum diatur' }} — <b>Aktif</b></td>
+                        <td class="ek-schedule">{{ $ekskul->jadwal_lengkap ?? 'Jadwal belum diatur' }}</td>
+                        <td class="ek-dash2">—</td>
+                        <td class="ek-status"><b>Aktif</b></td>
                     </tr>
                     @empty
                     <tr>
@@ -759,17 +749,18 @@
                                 <span class="status-badge badge-accepted">Disetujui</span>
                             @elseif($pend->status === 'ditolak')
                                 <span class="status-badge badge-rejected">Ditolak</span>
-                                @if($pend->catatan_admin)
-                                    <div style="font-size: 12px; color: #ef4444; font-weight: 600; margin-top: 4px;" title="{{ $pend->catatan_admin }}">
-                                        {{ Str::limit($pend->catatan_admin, 40) }}
-                                    </div>
-                                @endif
                             @endif
                         </td>
+                        @if($pend->status === 'ditolak' && $pend->catatan_admin)
+                        <td class="pend-dash">—</td>
+                        <td class="pend-reason" title="{{ $pend->catatan_admin }}">
+                            {{ Str::limit($pend->catatan_admin, 30) }}
+                        </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="3" style="text-align: center; color: #777; padding: 10px;">Belum ada status pendaftaran.</td>
+                        <td colspan="5" style="text-align: center; color: #777; padding: 10px;">Belum ada status pendaftaran.</td>
                     </tr>
                     @endforelse
                 </table>

@@ -122,7 +122,7 @@ class DashboardController extends Controller
             ->get();
 
         // 8. Ambil Nilai Siswa (untuk ekskul yang diikuti)
-        $nilaiSiswa = collect();
+        $nilaiSiswa = [];
         if (!empty($ekskulIds)) {
             $nilaiSiswa = DB::table('nilai')
                 ->join('ekstrakurikuler', 'nilai.ekskul_id', '=', 'ekstrakurikuler.id')

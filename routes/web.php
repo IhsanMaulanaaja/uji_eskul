@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PrestasiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('landing');
+    return view('beranda');
 })->name('landing');
 
 Route::get('/login-admin', function () {
@@ -14,6 +15,25 @@ Route::get('/login-admin', function () {
 Route::get('/login-pembina', function () {
     return view('auth.login-pembina');
 })->middleware('guest')->name('login-pembina');
+
+Route::get('/role-selection', function () {
+    return view('role-selection');
+})->middleware('guest')->name('role-selection');
+
+// HALAMAN PUBLIK
+Route::get('/tentang', function () {
+    return view('tentang');
+})->name('tentang');
+
+Route::get('/prestasi', [PrestasiController::class, 'indexPublic'])->name('prestasi');
+
+Route::get('/kontak', function () {
+    return view('kontak');
+})->name('kontak.index');
+
+// KONTAK CONTROLLER
+use App\Http\Controllers\KontakController;
+Route::post('/kontak', [KontakController::class, 'send'])->name('kontak.send');
 
 // DASHBOARD
 use App\Http\Controllers\DashboardController;
@@ -30,8 +50,6 @@ Route::resource('/users', UsersController::class)->middleware(['auth', 'verified
 use App\Http\Controllers\EkskulController;
 Route::get('/pilihan-ekskul', [EkskulController::class, 'pilihanEkskul'])->middleware(['auth', 'verified'])->name('pilihan-ekskul');
 Route::resource('/ekstrakurikuler', EkskulController::class)->middleware(['auth', 'verified']);
-Route::get('/ekstrakurikuler-kuota/edit', [EkskulController::class, 'editKuota'])->middleware(['auth', 'verified'])->name('ekstrakurikuler.editKuota');
-Route::put('/ekstrakurikuler-kuota/update', [EkskulController::class, 'updateKuota'])->middleware(['auth', 'verified'])->name('ekstrakurikuler.updateKuota');
 
 
 // PENDAFTARAN EKSKUL
@@ -44,7 +62,6 @@ Route::post('/pendaftaran-ekskul', [PendaftaranController::class, 'store'])->mid
 use App\Http\Controllers\AbsensiController;
 Route::get('/absensi-ekskul', [AbsensiController::class, 'index'])->middleware(['auth', 'verified'])->name('absensi-admin');
 Route::put('/absensi-ekskul/{id}', [AbsensiController::class, 'update'])->middleware(['auth', 'verified'])->name('absensi.update');
-Route::get('/absensi-test', function() { return view('absensi-test-debug'); })->middleware(['auth', 'verified'])->name('absensi-test');
 Route::get('/absensi-siswa', [AbsensiController::class, 'siswa'])->middleware(['auth', 'verified'])->name('absensi-siswa');
 Route::post('/absensi-siswa', [AbsensiController::class, 'storeSiswa'])->middleware(['auth', 'verified'])->name('absensi-siswa.store');
 
@@ -62,8 +79,6 @@ Route::post('/jadwal-ekskul', [JadwalController::class, 'store'])->middleware(['
 Route::get('/jadwal-ekskul/{id}/edit', [JadwalController::class, 'edit'])->middleware(['auth', 'verified'])->name('jadwal.edit');
 Route::put('/jadwal-ekskul/{id}', [JadwalController::class, 'update'])->middleware(['auth', 'verified'])->name('jadwal.update');
 Route::delete('/jadwal-ekskul/{id}', [JadwalController::class, 'destroy'])->middleware(['auth', 'verified'])->name('jadwal.destroy');
-
-use App\Http\Controllers\PrestasiController;
 
 Route::get('/prestasi-ekskul', [PrestasiController::class, 'indexAdmin'])
     ->middleware(['auth', 'verified'])

@@ -10,6 +10,25 @@ use Illuminate\Support\Facades\Storage;
 
 class PrestasiController extends Controller
 {
+    // === PUBLIC PRESTASI PAGE ===
+    public function indexPublic()
+    {
+        // Get all dokumentasi (achievements) with their related data
+        $prestasi = Dokumentasi::with(['lomba', 'ekstrakurikuler'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Group by ekstrakurikuler for better organization
+        $prestasiByEkskul = $prestasi->groupBy(function ($item) {
+            return $item->ekstrakurikuler ? $item->ekstrakurikuler->nama : 'Lainnya';
+        });
+
+        return view('prestasi', [
+            'prestasi' => $prestasi,
+            'prestasiByEkskul' => $prestasiByEkskul
+        ]);
+    }
+
     // === GALERI FOTO (DOKUMENTASI) ===
 
     public function indexAdmin()
